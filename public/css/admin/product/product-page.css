@@ -1,0 +1,95 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+    /* Reset padding */
+    height: 100vh;
+    /* Set height to 100% of the viewport */
+    width: 100vw;
+    /* Set width to 100% of the viewport */
+    box-sizing: border-box;
+    /* Ensure padding and borders are included in dimensions */
+}
+
+
+.content-title {
+    font-size: 2rem;
+    color: #333;
+    text-transform: uppercase;
+}
+
+.table {
+    background-color: #fff;
+    border-collapse: collapse;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.table thead {
+    background-color: #4CAF50;
+    color: #fff;
+}
+
+.table th,
+.table td {
+    text-align: center;
+    padding: 10px;
+}
+
+.btn {
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    padding: 5px 10px;
+}
+
+.btn-info a,
+.btn-danger a,
+.btn-success a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #4CAF50;
+    border-color: #4CAF50;
+}
+
+@media (max-width: 768px) {
+    .content-title {
+        font-size: 1.5rem;
+        text-align: center;
+    }
+
+    .input-group {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .table th,
+    .table td {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+
+    .btn {
+        font-size: 0.8rem;
+        padding: 3px 7px;
+    }
+}
+
+@media (max-width: 576px) {
+    .content-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .table {
+        font-size: 0.8rem;
+    }
+
+    .btn {
+        display: block;
+        width: 100%;
+        margin: 5px 0;
+    }
+}

@@ -1,0 +1,210 @@
+<%- include("../../views/partials/admin/header") %>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #343a40;
+        }
+
+        .card {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: none;
+        }
+
+        .filter-btn {
+            margin: 0 5px;
+        }
+
+        table th,
+        table td {
+            vertical-align: middle;
+        }
+    </style>
+
+    <!-- Main Content -->
+    <main class="p-4">
+
+
+        <div class="container my-4">
+            <h2 class="text-center mb-4">Sales Report</h2>
+
+            <!-- Summary Cards -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card p-3">
+                        <h5 class="card-title">Overall Sales Count</h5>
+                        <h3 class="text-primary" id="sales-count">
+                            <%= overallSalesCount %>
+                        </h3>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card p-3">
+                        <h5 class="card-title">Overall Sales Amount</h5>
+                        <h3 class="text-success" id="sales-amount">Rs <%= overallSalesAmount %>
+                        </h3>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card p-3">
+                        <h5 class="card-title">Overall Discounts</h5>
+                        <h3 class="text-danger" id="sales-discount">Rs <%= overallDiscount %>
+                        </h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <!-- <button >Custom Data</button> -->
+                    <input type="date" id="startDate" class="btn btn-outline-primary filter-btn" style="width: auto;">
+                    <label for="">--</label>
+                    <input type="date" id="endDate" class="btn btn-outline-primary filter-btn" style="width: auto;">
+                    <button id="filterOrdersBtn" class="btn btn-outline-secondary filter-btn">Filter</button>
+
+                </div>
+
+                <div class="dropdown" style="justify-content: baseline;">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        Filter By
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                        <li><a class="dropdown-item" href="#" data-filter="today">Today</a></li>
+                        <li><a class="dropdown-item" href="#" data-filter="yesterday">Yesterday</a></li>
+                        <li><a class="dropdown-item" href="#" data-filter="7days">Last 7 Days</a></li>
+                        <li><a class="dropdown-item" href="#" data-filter="30days">Last 30 Days</a></li>
+                        <li><a class="dropdown-item" href="#" data-filter="thisMonth">This Month</a></li>
+                        <li><a class="dropdown-item" href="#" data-filter="lastMonth">Last Month</a></li>
+                        <li><a class="dropdown-item" href="#" data-filter="3months">Last 3 Months</a></li>
+                        <li><a class="dropdown-item" href="#" data-filter="6months">Last 6 Months</a></li>
+                        <li><a class="dropdown-item" href="#" data-filter="thisYear">This Year</a></li>
+                        <li><a class="dropdown-item" href="#" data-filter="lastYear">Last Year</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#" data-filter="all">All Time</a></li>
+                    </ul>
+                </div>
+
+
+                <div>
+                    <button class="btn btn-success" id="downloadPDF">Download PDF</button>
+                    <button class="btn btn-success" id="downloadExcel">Download Excel</button>
+
+                </div>
+            </div>
+
+            <div>
+                <h4 id="filterInfo">Order List <%=filterDescription %>
+                </h4>
+            </div>
+
+            <!-- Order Table -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>No</th>
+                            <th>Data</th>
+                            <th>User</th>
+                            <th>Items</th>
+                            <th>Total Amount</th>
+                            <th>Offer Amount</th>
+                            <th>Coupon Amount</th>
+                            <th>Payment</th>
+                            <!-- <th>Status</th>
+                  <th>Actions</th> -->
+                        </tr>
+                    </thead>
+                    <tbody id="order-list">
+
+                        <% orders.forEach((order, index)=> { %>
+
+                            <tr id="order-list tr">
+                                <td>
+                                    <%= index + 1 %>
+                                </td>
+                                <td>
+                                    <%= new Date(order.createdAt).toLocaleDateString('en-US') %>
+                                </td>
+                                <td>
+                                    <%= order.userId?.name %>
+                                </td>
+                                <td>
+                                    <% order.items.forEach((item)=> { %>
+
+                                        <p>Product :<%= item.productId.productName || "N/A" %> ,<br>
+                                                Qty: <%= item.quantity || "N/A" %> ,Size: <%= item.size || "N/A" %>
+                                                        , Status: <%= item.status || "N/A" %><br>
+
+
+                                        </p>
+                                        <% }); %>
+                                </td>
+
+                                <td>Rs <%= order.totalAmount %>
+                                </td>
+
+                                <td><span>Rs <%= order.totalregularPrice ? (Math.round((order.totalregularPrice -
+                                            order.totalAmount) * 100) / 100).toFixed(2) : 0 %></span>
+                                </td>
+                                <td>Rs <%= order.coupenOffer || 0 %>
+                                </td>
+                                <td>
+                                    <%= order.paymentMethod %>
+                                </td>
+
+                            </tr>
+                            <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination Controls -->
+        <nav aria-label="Sales report pagination" class="mt-4">
+            <ul class="pagination justify-content-center">
+
+                <!-- Previous Button -->
+                <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                    <a class="page-link"
+                        href="?page=<%= currentPage - 1 %>&startDate=<%= startDate || '' %>&endDate=<%= endDate || '' %>">
+                        Previous
+                    </a>
+                </li>
+
+                <!-- Page Numbers -->
+                <% for (let i=1; i <=totalPages; i++) { %>
+
+                    <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                        <a class="page-link"
+                            href="?page=<%= i %>&startDate=<%= startDate || '' %>&endDate=<%= endDate || '' %>">
+                            <%= i %>
+                        </a>
+                    </li>
+
+                    <% } %>
+
+                        <!-- Next Button -->
+                        <li class="page-item <%= currentPage === totalPages || totalPages === 0 ? 'disabled' : '' %>">
+                            <a class="page-link"
+                                href="?page=<%= currentPage + 1 %>&startDate=<%= startDate || '' %>&endDate=<%= endDate || '' %>">
+                                Next
+                            </a>
+                        </li>
+
+            </ul>
+        </nav>
+
+
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="/js/admin/adminSalesReport.js"></script>
+
+
+        </body>
+    </main>
+    <%- include("../../views/partials/admin/footer") %>

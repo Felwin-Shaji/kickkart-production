@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login</title>
+  <link rel="stylesheet" href="/css/userSignUp.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<style>
+  .login-box {
+    background-color: rgba(255, 255, 255, 0.158);
+    padding: 50px;
+    border-radius: 5%;
+  }
+
+  .error-message {
+    color: red;
+    font-size: 14px;
+    display: block;
+    margin-top: 5px;
+  }
+</style>
+
+<body>
+  <div class="container">
+    <div class="login-box">
+      <h1>Admin Log In</h1>
+
+      <form id="adminLoginForm">
+        <div class="input-group">
+          <label for="adminEmail">Admin Email</label>
+          <input type="email" id="adminEmail">
+          <small id="emailError" class="error-message"></small>
+        </div>
+        <div class="input-group">
+          <label for="adminPassword">Password</label>
+          <input type="password" id="adminPassword">
+          <small id="passwordError" class="error-message"></small>
+        </div>
+        <button type="submit">Log In</button>
+      </form>
+    </div>
+  </div>
+</body>
+
+<script>
+  document.getElementById('adminLoginForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+  
+      const emailInput = document.getElementById('adminEmail');
+      const passwordInput = document.getElementById('adminPassword');
+      const emailError = document.getElementById('emailError');
+      const passwordError = document.getElementById('passwordError');
+  
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+  
+      let isValid = true;
+  
+      // Reset error messages
+      emailError.textContent = "";
+      passwordError.textContent = "";
+  
+      // Email Validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email) {
+          emailError.textContent = "Email is required.";
+          isValid = false;
+      } else if (!emailRegex.test(email)) {
+          emailError.textContent = "Invalid email format.";
+          isValid = false;
+      }
+  
+      // Password Validation
+      if (!password) {
+          passwordError.textContent = "Password is required.";
+          isValid = false;
+      } else if (password.length < 6) {
+          passwordError.textContent = "Password must be at least 6 characters.";
+          isValid = false;
+      }
+  
+      // Stop form submission if validation fails
+      if (!isValid) return;
+  
+      try {
+          const response = await fetch('/admin/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, password })
+          });
+  
+          const result = await response.json();
+  
+          if (result.success) {
+              await Swal.fire({
+                  icon: 'success',
+                  title: 'Login Successful!',
+                  text: result.message,
+                  timer: 1500,
+                  showConfirmButton: false
+              });
+              window.location.href = result.redirectUrl;
+  
+          } else {  
+              await Swal.fire({
+                  icon: 'error',
+                  title: 'Login Failed',
+                  text: result.message || 'Invalid credentials. Please try again.'
+              });
+          }
+      } catch (error) {
+          console.error('Error:', error);
+          await Swal.fire({
+              icon: 'error',
+              title: 'Oops!',
+              text: 'Something went wrong. Please try again later.'
+          });
+      }
+  });
+  </script>
+
+</html>

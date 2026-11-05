@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive Sign-Up Page</title>
+  <!-- <link rel="stylesheet" href="styles.css"> -->
+  <link rel="stylesheet" href="/css/userSignUp.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRP4Nn9zR1EYF3zU3UOKb5fNKlfZLfyRFsE/Pik9E" crossorigin="anonymous">
+
+</head>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+  .custom-swal-popup {
+    background-color: #f7f9fc;
+    border: 2px solid #4caf50;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .custom-swal-title {
+    color: #4caf50;
+    font-family: 'Arial', sans-serif;
+    font-size: 1.8em;
+  }
+
+  .custom-swal-html {
+    color: #333;
+    font-family: 'Verdana', sans-serif;
+    font-size: 1em;
+  }
+
+  /* Container Flexbox Styling */
+  .referral-code-container {
+    display: flex;
+    justify-content: flex-start;
+    /* Align buttons to the left */
+    align-items: center;
+    gap: 15px;
+    /* Space between buttons */
+    margin-top: 10px;
+  }
+
+  /* Button Common Styles */
+  .btn-icon {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    font-size: 18px;
+    color: #fff;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Verify Button Colors */
+  #verifyButton {
+    background-color: #28a745;
+    /* Green */
+  }
+
+  #verifyButton:hover {
+    background-color: #218838;
+    /* Darker green on hover */
+    transform: scale(1.1);
+    /* Subtle zoom-in effect */
+  }
+
+  /* Close Button Colors */
+  #closeButton {
+    background-color: #dc3545;
+    /* Red */
+  }
+
+  #closeButton:hover {
+    background-color: #c82333;
+    /* Darker red on hover */
+    transform: scale(1.1);
+    /* Subtle zoom-in effect */
+  }
+</style>
+
+<body>
+  <div class="container">
+    <div class="signup-box">
+      <h1>Sign Up</h1>
+      <form id="signupForm">
+        <div class="input-group">
+          <label for="Name">Name</label>
+          <input type="text" id="name" name="name" title="Only letters allowed">
+          <span class="error-message" id="nameError"></span>
+        </div>
+        <div class="input-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email">
+          <span class="error-message" id="emailError"></span>
+        </div>
+        <div class="input-group">
+          <label for="phoneNo">Phone No</label>
+          <input type="text" id="phone" name="phone" title="Enter a valid 10-digit phone number">
+          <span class="error-message" id="phoneError"></span>
+        </div>
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" minlength="8">
+          <span class="error-message" id="passwordError"></span>
+        </div>
+        <div class="input-group">
+          <label for="confirm-password">Confirm Password</label>
+          <input type="password" id="confirm-password" name="confirmPassword">
+          <span class="error-message" id="confirmPasswordError"></span>
+        </div>
+        <div class="input-grou">
+          <input type="checkbox" id="useReferralCode">
+          <label style="color: #b8b8b8;">
+            Use Referral Code
+          </label>
+
+        </div>
+        <div class="input-group" id="referralCodeDiv" style="display: none;">
+          <label for="referal-code">Referral Code</label>
+          <div class="referral-code-container">
+            <input type="text" id="referal-code" name="referalCode" placeholder="Enter Referral Code">
+            <span class="error-message" id="referalCodeError"></span>
+            <div class="referral-code-container">
+              <button type="button" id="verifyButton" class="btn-icon">
+                <i class="fas fa-check"></i>
+              </button>
+              <button type="button" id="closeButton" class="btn-icon btn-close">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+
+
+          </div>
+          <span class="error-message" id="referralCodeError"></span>
+        </div>
+        <button type="submit">Create Account</button>
+      </form>
+
+
+      <a href="/auth/google">
+        <button type="submit">
+          <i class="bi bi-google"></i>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-google"
+            viewBox="0 0 16 16">
+            <path
+              d="M15.545 6.558a9.4 9.4 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.7 7.7 0 0 1 5.352 2.082l-2.284 2.284A4.35 4.35 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.8 4.8 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.7 3.7 0 0 0 1.599-2.431H8v-3.08z" />
+          </svg>
+          Sign Up With Google
+        </button></a>
+      <p class="login-link">Already have an account? <a href="/login">Log In</a></p>
+    </div>
+  </div>
+
+  <script>
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const useReferralCodeCheckbox = document.getElementById("useReferralCode");
+      const referralCodeDiv = document.getElementById("referralCodeDiv");
+      const closeButton = document.getElementById("closeButton");
+      const verifyButton = document.getElementById("verifyButton");
+      const referralCodeInput = document.getElementById("referal-code");
+      const referralCodeError = document.getElementById("referalCodeError");
+
+      // Show/Hide referral code input based on checkbox
+      useReferralCodeCheckbox.addEventListener("change", () => {
+        if (useReferralCodeCheckbox.checked) {
+          referralCodeDiv.style.display = "block";
+        } else {
+          referralCodeDiv.style.display = "none";
+        }
+      });
+
+      // Verify referral code
+      verifyButton.addEventListener("click", async () => {
+        const referralCode = referralCodeInput.value.trim();
+
+        // Validate input
+        if (!referralCode) {
+          referralCodeError.textContent = "The referral code field is empty.";
+          referralCodeError.style.color = "red";
+          return;
+        }
+
+        try {
+          // Send the referral code to the server for verification
+          const response = await fetch("/varifyReferelCode", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ referralCode }),
+          });
+
+          // Handle the response
+          const result = await response.json();
+          if (response.ok) {
+            // Referral code is valid
+            referralCodeError.textContent = "Referral code verified successfully!";
+            referralCodeError.style.color = "green";
+          } else {
+            // Invalid referral code
+            referralCodeError.textContent = result.message || "Invalid referral code.";
+            referralCodeError.style.color = "red";
+          }
+        } catch (error) {
+          // Handle fetch or server error
+          console.error("Error verifying referral code:", error);
+          referralCodeError.textContent = "An error occurred while verifying the referral code.";
+          referralCodeError.style.color = "red";
+        }
+      });
+
+      // Close referral code input
+      closeButton.addEventListener("click", () => {
+        referralCodeDiv.style.display = "none";
+        useReferralCodeCheckbox.checked = false;
+        referralCodeInput.value = ""; // Clear input
+        referralCodeError.textContent = ""; // Clear error message
+      });
+    });
+
+
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const element = document.getElementById("signupForm");
+
+      if (element) {
+        element.addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          let isValid = true;
+          const name = document.getElementById("name").value.trim();
+          const email = document.getElementById("email").value.trim();
+          const phone = document.getElementById("phone").value.trim();
+          const password = document.getElementById("password").value;
+          const confirmPassword = document.getElementById("confirm-password").value;
+          const referralCodeInput = document.getElementById("referal-code").value;
+
+          console.log("Form Inputs:", { name, email, phone, password, confirmPassword, referralCodeInput });
+
+
+          document.querySelectorAll(".error-message").forEach((span) => (span.textContent = ""));
+
+
+          if (!/^[a-zA-Z\s]+$/.test(name)) {
+            document.getElementById("nameError").textContent = "Name must contain only letters.";
+            isValid = false;
+          }
+
+
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            document.getElementById("emailError").textContent = "Please enter a valid email address.";
+            isValid = false;
+          }
+
+          if (!/^\d{10}$/.test(phone)) {
+            document.getElementById("phoneError").textContent = "Phone number must be exactly 10 digits.";
+            isValid = false;
+          }
+
+
+          if (password.length < 8) {
+            document.getElementById("passwordError").textContent = "Password must be at least 8 characters long.";
+            isValid = false;
+          }
+
+
+          if (confirmPassword !== password) {
+            document.getElementById("confirmPasswordError").textContent = "Passwords do not match.";
+            isValid = false;
+          }
+
+          // if (!referralCodeInput) {
+          //   document.getElementById("referalCodeError").textContent = "Referral Code ";
+          // }
+
+          if (!isValid) {
+            console.log("Form validation failed.");
+            return;
+          }
+
+
+          try {
+            const response = await fetch("/signup", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ name, phone, email, password, confirmPassword, referralCodeInput }),
+            });
+
+            const data = await response.json();
+            console.log("Server Response:", data);
+
+            if (response.ok) {
+              await Swal.fire({
+                title: "Success!",
+                text: data.message,
+                icon: "success",
+                showConfirmButton: false,
+                timer: 3000,
+              });
+
+              window.location.href = "/verify-otp";
+            } else {
+              Swal.fire({
+                title: "Error!",
+                text: data.message || "Something went wrong!",
+                icon: "error",
+                confirmButtonText: "OK",
+              });
+            }
+          } catch (error) {
+            console.error("Error during signup:", error);
+            Swal.fire({
+              title: "Error!",
+              text: "Something went wrong. Please try again.",
+              icon: "error",
+              confirmButtonText: "OK",
+            });
+          }
+        });
+      }
+    });
+
+  </script>
+
+
+</body>
+
+
+
+
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-kQtW33rZJAHjgefvhyyzcGFzbK6E9RaUz1Z9xO2VF+UogEdCElwOaIwzg5mDk7gD" crossorigin="anonymous"></script> -->
+
+
+</html>

@@ -1,0 +1,139 @@
+<%- include("../partials/admin/header.ejs") %>
+    <style>
+        body {
+            background-color: #343a40;
+        }
+    </style>
+    <div class="container my-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h1 class="h4 mb-0">Order Details</h1>
+            </div>
+            <div class="card-body">
+                <!-- Order Info -->
+                <div class="mb-4">
+                    <p><strong>Order ID:</strong>
+                        <%= order._id %>
+                    </p>
+                    <p><strong>User:</strong>
+                        <%= order.userId.name %>
+                    </p>
+                    <p><strong>Date , Time</strong>
+                        <%= new Date(order.createdAt).toLocaleDateString('en-US') %> ,
+                            <%= new Date(order.createdAt).toLocaleTimeString('en-US') %>
+                    </p>
+                    <p><strong>Payment Method</strong>:
+                        <%= order.paymentMethod %>
+                    </p>
+                    <!-- <p><strong>Status:</strong>
+                        <span
+                            class="badge <%= order.status === 'Delivered' ? 'bg-success' : order.status === 'Pending' ? 'bg-warning' : 'bg-secondary' %>">
+                            <%= order.status %>
+                        </span>
+                    </p> -->
+                </div>
+
+                <!-- Order Items -->
+                <h3 class="h5 mb-3">Items</h3>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% order.items.forEach(function(item) { %>
+                                <tr>
+                                    <td>
+                                        <%= item.productId?.productName %>,(size: <%= item.size %>)
+                                    </td>
+                                    <td>
+                                        <%= item.quantity %>
+                                    </td>
+                                    <td>&#8377;<%= item.price %>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge 
+                                                <%= item.status === 'Pending' ? 'bg-warning' : 
+                                                    item.status === 'Shipped' ? 'bg-info' : 
+                                                    item.status === 'Delivered' ? 'bg-success' : 
+                                                    'bg-danger' %>">
+                                            <%= item.status %>
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <form action="/admin/orders/<%= order._id %>/<%= item?._id %>/status" method="POST" class="d-inline">
+                                            <!-- Hidden input for item ID -->
+                                            <input type="hidden" name="itemId" value="<%= order._id %>" />
+                                            
+                                            <!-- Status dropdown -->
+                                            <select name="status" class="form-select form-select-sm d-inline w-auto" 
+                                                <%= (item.status === "Cancelled" || item.status === "Returned" || item.status === "Delivered") ? "disabled" : "" %>>
+                                                
+                                                <option value="Pending" 
+                                                    <%= item.status === "Pending" ? "selected" : "" %> 
+                                                    <%= item.status === "Delivered" ? "disabled" : "" %>>Pending
+                                                </option>
+                                                
+                                                <option value="Shipped" <%= item.status === "Shipped" ? "selected" : "" %>>Shipped</option>
+                                                <option value="Delivered" <%= item.status === "Delivered" ? "selected" : "" %>>Delivered</option>
+                                            </select>
+                                        
+                                            <!-- Submit button -->
+                                            <button type="submit" class="btn btn-primary btn-sm" 
+                                                <%= (item.status === "Cancelled" || item.status === "Returned") ? "disabled" : "" %>>
+                                                &#10003;
+                                            </button>
+                                        </form>
+                                        
+                                    </td>
+                                </tr>
+                                <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Shipping Address -->
+                <h3 class="h5 mt-4">Shipping Address</h3>
+                <p class="mb-1"><strong>Address Type:</strong>
+                    <%= order.shippingAddress.addressType %>
+                </p>
+                <p class="mb-1"><strong>Name:</strong>
+                    <%= order.shippingAddress.name %>
+                </p>
+                <p class="mb-1"><strong>City:</strong>
+                    <%= order.shippingAddress.city %>
+                </p>
+                <p class="mb-1"><strong>Landmark:</strong>
+                    <%= order.shippingAddress.landMark %>
+                </p>
+                <p class="mb-1"><strong>State:</strong>
+                    <%= order.shippingAddress.state %>
+                </p>
+                <p class="mb-1"><strong>PinCode:</strong>
+                    <%= order.shippingAddress.pincode %>
+                </p>
+                <p class="mb-1"><strong>Phone:</strong>
+                    <%= order.shippingAddress.phone %>
+                </p>
+                <p class="mb-1"><strong>Alternate Phone:</strong>
+                    <%= order.shippingAddress.altPhone %>
+                </p>
+
+                <!-- Total Amount -->
+                <h3 class="h5 mt-4">Total Amount: <span class="text-success">&#8377;<%= order.totalAmount %></span></h3>
+
+                <!-- Back Button -->
+                <a href="/admin/orders" class="btn btn-outline-secondary mt-3">Back to Orders</a>
+            </div>
+        </div>
+    </div>
+
+    <%- include("../partials/admin/footer.ejs") %>

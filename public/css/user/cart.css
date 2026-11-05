@@ -1,0 +1,286 @@
+        /* General Styles for the Cart */
+        .product-name,
+        .product-cart {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            flex-wrap: wrap;
+        }
+
+        .product-name span,
+        .product-cart .display-tc {
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
+        .product-img {
+            width: 80px;
+            height: 80px;
+            background-size: cover;
+            background-position: center;
+            margin-left: 40px;
+            margin-right: 10px;
+        }
+
+        .display-tc h4 {
+            margin-left: 15px;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .display-tv h5 {
+            color: #007BFF;
+            margin-left: 30px;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .error-message {
+            background-color: #ffe6e6;
+            /* Light red background */
+            color: #d9534f;
+            /* Red text color */
+            font-size: 16px;
+            /* Slightly larger font size */
+            padding: 10px 15px;
+            /* Padding for spacing */
+            border: 1px solid #d9534f;
+            /* Red border */
+            border-radius: 5px;
+            /* Rounded corners */
+            margin-bottom: 15px;
+            /* Space below the message */
+            text-align: center;
+            /* Center align the message */
+        }
+
+        .error-message strong {
+            font-weight: bold;
+            /* Bold the strong tags */
+        }
+
+
+        .display-tc p {
+            color: black;
+            margin-left: 15px;
+            margin-bottom: 0px;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .checkout-btn button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        /* Styling the quantity input container */
+        .quantity-input {
+            color: #000000;
+        }
+
+        /* Decrement button styling */
+        .decrement-btn {
+            display: inline-block;
+            margin-bottom: 61px;
+            width: 30px;
+            height: 30px;
+            font-weight: 600;
+            border: 1px solid #ddd;
+            background-color: #f1f1f1;
+            color: #333;
+            font-size: 16px;
+            line-height: 30px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 10%;
+            /* Circular button */
+            transition: all 0.2s;
+        }
+
+        .decrement-btn:hover {
+            background-color: #6a9ef8;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        /* Increment button styling */
+        .increment-btn {
+            display: inline-block;
+            margin-bottom: 61px;
+            font-weight: 600;
+            width: 30px;
+            height: 30px;
+            border: 1px solid #ddd;
+            background-color: #f1f1f1;
+            color: #333;
+            font-size: 16px;
+            line-height: 30px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 10%;
+            /* Circular button */
+            transition: all 0.2s;
+        }
+
+        .increment-btn:hover {
+            background-color: #6a9ef8;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        /* Responsive layout for buttons and input */
+        .one-eight.text-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-weight: 600;
+        }
+
+        /* Adjust for smaller screens */
+        @media (max-width: 768px) {
+            .quantity-input {
+                width: 40px;
+                font-size: 12px;
+            }
+
+            .decrement-btn,
+            .increment-btn {
+                width: 25px;
+                height: 25px;
+                font-size: 14px;
+                line-height: 25px;
+            }
+        }
+
+        .remove-item {
+            background-color: #333;
+            /* Bright red background */
+            color: #fff;
+            /* White icon color */
+            border: none;
+            /* Remove default border */
+            border-radius: 4px;
+            /* Smooth corners */
+            padding: 5px 5px;
+            /* Adjust padding for better size */
+            font-size: 14px;
+            /* Icon size */
+            cursor: pointer;
+            /* Pointer cursor on hover */
+            transition: all 0.3s ease;
+            /* Smooth hover effect */
+        }
+
+        .remove-item:hover {
+            background-color: #d32f2f;
+            /* Darker red on hover */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            /* Subtle shadow on hover */
+            transform: scale(1.1);
+            /* Slightly enlarge on hover */
+        }
+
+        .remove-item:active {
+            background-color: #b71c1c;
+            /* Even darker red when clicked */
+            transform: scale(0.95);
+            /* Slightly shrink when clicked */
+        }
+
+        .remove-item i {
+            margin: 0;
+            /* Ensure icon is centered */
+            vertical-align: middle;
+            /* Align icon with button content */
+        }
+
+
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+
+            .product-name,
+            .product-cart {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .product-cart .one-forth,
+            .product-cart .one-eight {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .product-img {
+                width: 60px;
+                height: 60px;
+            }
+
+            .quantity-input {
+                width: 50px;
+            }
+
+            .checkout-btn button {
+                font-size: 14px;
+            }
+
+            .breadcrumbs .bread {
+                font-size: 14px;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .product-img {
+                width: 50px;
+                height: 50px;
+            }
+
+            .display-tc h4 {
+                font-size: 12px;
+            }
+
+            .display-tc p {
+                font-size: 12px;
+            }
+
+            .quantity-input {
+                width: 40px;
+            }
+
+            .breadcrumbs .bread {
+                font-size: 12px;
+            }
+
+            .checkout-btn button {
+                font-size: 12px;
+                padding: 8px;
+            }
+
+            .total-wrap .row .sub p span,
+            .grand-total span {
+                font-size: 12px;
+            }
+        }
+
+        /* Related Products Responsiveness */
+        @media (max-width: 768px) {
+            .product-entry {
+                margin-bottom: 20px;
+            }
+
+            .product-entry img {
+                width: 100%;
+                height: auto;
+            }
+
+            .product-entry h2,
+            .product-entry span.price {
+                font-size: 14px;
+            }
+        }

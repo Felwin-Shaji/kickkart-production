@@ -1,0 +1,465 @@
+
+/* ==============================
+   General Styles
+================================ */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+h1 {
+    text-align: center;
+    color: #004cff;
+    margin: 20px 0;
+}
+
+h3 {
+    color: #333;
+}
+
+/* ==============================
+   Coupon Header
+================================ */
+
+.coupon-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin: 25px 30px;
+}
+
+.coupon-header h3 {
+    text-align: center;
+    margin: 0;
+    font-size: 24px;
+}
+
+.coupon-header .open-modal-btn {
+    position: absolute;
+    left: 0;
+    padding: 8px 16px;
+    font-size: 13px;
+    width: auto;
+    height: auto;
+    cursor: pointer;
+}
+
+/* ==============================
+   Buttons
+================================ */
+
+.open-modal-btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    background-color: #007BFF;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.open-modal-btn:hover {
+    background-color: #0056b3;
+}
+
+button {
+    padding: 10px 20px;
+    margin-top: 10px;
+    border: none;
+    background-color: #28a745;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+/* ==============================
+   Modal Background
+================================ */
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(4px);
+    padding: 30px 15px;
+    box-sizing: border-box;
+}
+
+/* ==============================
+   Coupon Modal Container
+================================ */
+
+.coupon-modal-content {
+    background: #ffffff;
+    width: 100%;
+    max-width: 650px;
+    margin: 30px auto;
+    padding: 28px;
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+    animation: couponModalOpen 0.25s ease;
+}
+
+@keyframes couponModalOpen {
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==============================
+   Modal Header
+================================ */
+
+.coupon-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 18px;
+    margin-bottom: 24px;
+}
+
+.coupon-modal-header h3 {
+    margin: 0;
+    color: #1e293b;
+    font-size: 23px;
+    font-weight: 700;
+}
+
+.coupon-modal-header p {
+    margin: 6px 0 0;
+    color: #64748b;
+    font-size: 13px;
+}
+
+/* Close Button */
+
+.coupon-modal-header .close {
+    border: none;
+    background: #f1f5f9;
+    color: #475569;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    float: none;
+}
+
+.coupon-modal-header .close:hover {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+/* ==============================
+   Coupon Form Layout
+================================ */
+
+.coupon-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.coupon-form-grid .form-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.coupon-form-grid .form-group.full-width {
+    grid-column: span 2;
+}
+
+/* Labels */
+
+.coupon-form-grid .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    margin: 0 0 8px;
+}
+
+/* Inputs */
+
+.coupon-form-grid .form-group input {
+    width: 100%;
+    height: 43px;
+    padding: 0 12px;
+    margin: 0;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    font-size: 14px;
+    color: #1e293b;
+    outline: none;
+    transition: 0.2s ease;
+    box-sizing: border-box;
+}
+
+.coupon-form-grid .form-group input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.coupon-form-grid .form-group input::placeholder {
+    color: #94a3b8;
+}
+
+/* Validation */
+
+.coupon-form-grid .form-group input.invalid {
+    border-color: #dc2626;
+}
+
+.coupon-form-grid .error-message {
+    display: none;
+    color: #dc2626;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* ==============================
+   Modal Footer
+================================ */
+
+.coupon-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.coupon-modal-footer button {
+    border: none;
+    padding: 11px 20px;
+    margin: 0;
+    border-radius: 7px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.coupon-modal-footer .cancel-btn {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.coupon-modal-footer .cancel-btn:hover {
+    background: #e2e8f0;
+}
+
+.coupon-modal-footer .save-coupon-btn {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.coupon-modal-footer .save-coupon-btn:hover {
+    background: #1d4ed8;
+}
+
+/* ==============================
+   General Form Elements
+================================ */
+
+label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* ==============================
+   Table Styles
+================================ */
+
+table {
+    width: 90%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+table th,
+table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+table th {
+    background-color: #004cff;
+    color: white;
+}
+
+table tr:hover {
+    background-color: #f1f1f1;
+}
+
+table td form button {
+    background-color: #e74c3c;
+    color: white;
+    padding: 6px 10px;
+    font-size: 14px;
+}
+
+table td form button:hover {
+    background-color: #c0392b;
+}
+
+/* ==============================
+   Error Messages
+================================ */
+
+.error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+}
+
+input.invalid {
+    border-color: red;
+}
+
+/* ==============================
+   Pagination
+================================ */
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    gap: 5px;
+    padding: 0;
+    margin: 25px 0;
+}
+
+.pagination .page-link {
+    display: block;
+    padding: 8px 13px;
+    color: #2563eb;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.pagination .page-item.active .page-link {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+
+/* ==============================
+   Responsive Styles
+================================ */
+
+@media (max-width: 768px) {
+
+    .coupon-header {
+        margin: 25px 15px;
+    }
+
+    .coupon-header h3 {
+        font-size: 20px;
+    }
+
+    .coupon-header .open-modal-btn {
+        padding: 7px 10px;
+        font-size: 11px;
+    }
+
+    table {
+        width: 100%;
+        font-size: 14px;
+    }
+
+    table th,
+    table td {
+        padding: 8px;
+    }
+
+    .coupon-modal-content {
+        max-width: 550px;
+        padding: 22px;
+        margin: 15px auto;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .coupon-form-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .coupon-form-grid .form-group.full-width {
+        grid-column: span 1;
+    }
+
+    .coupon-modal-content {
+        padding: 20px;
+        margin: 10px auto;
+    }
+
+    .coupon-modal-header h3 {
+        font-size: 19px;
+    }
+
+    .coupon-modal-footer button {
+        flex: 1;
+    }
+
+    .coupon-header {
+        justify-content: flex-end;
+    }
+
+    .coupon-header h3 {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
+    }
+}

@@ -1,0 +1,248 @@
+<%- include("../../views/partials/admin/header") %>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
+    <link rel="stylesheet" href="/css/admin/product/add-Product-Page.css">
+
+    <section class="content-main product-page">
+        <div class="product-page__header">
+            <div>
+                <p class="eyebrow">CATALOG MANAGEMENT</p>
+                <h1>Add new product</h1>
+                <p class="page-subtitle">Add product details, manage stock variants, and upload product images.</p>
+            </div>
+            <a href="/admin/products" class="back-link">← Back to products</a>
+        </div>
+
+        <form id="productForm" method="post" action="/admin/addProducts" enctype="multipart/form-data">
+
+            <section class="form-card">
+                <div class="section-heading">
+                    <div class="section-number">01</div>
+                    <div>
+                        <h2>Product information</h2>
+                        <p>Enter the basic details customers will see.</p>
+                    </div>
+                </div>
+
+                <div class="form-grid form-grid--three">
+                    <div class="field field--full">
+                        <label for="product_name" class="form-label">Product name <span
+                                class="required">*</span></label>
+                        <input type="text" placeholder="e.g. Classic cotton T-shirt" name="productName"
+                            class="form-control" id="product_name">
+                        <div id="productName-error" class="error-message"></div>
+                    </div>
+
+                    <div class="field field--compact">
+                        <label for="brand" class="form-label">Brand <span class="required">*</span></label>
+                        <select class="form-select" name="brand" id="brand">
+                            <% for(let i=0;i<brand.length;i++){ %>
+                                <option value="<%=brand[i].brandName%>">
+                                    <%=brand[i].brandName%>
+                                </option>
+                                <% } %>
+                        </select>
+                        <div id="brand-error" class="error-message"></div>
+                    </div>
+
+                    <div class="field field--compact">
+                        <label for="category" class="form-label">Category <span class="required">*</span></label>
+                        <select class="form-select" name="category" id="category">
+                            <% for(let i=0;i<cat.length;i++){ %>
+                                <option value="<%= cat[i].name %>">
+                                    <%= cat[i].name %>
+                                </option>
+                                <% } %>
+                        </select>
+                        <div id="category-error" class="error-message"></div>
+                    </div>
+
+                    <div class="field field--full">
+                        <label for="descriptionid" class="form-label">Full description <span
+                                class="required">*</span></label>
+                        <textarea
+                            placeholder="Describe the product, its material, fit, features, and other useful details."
+                            id="descriptionid" name="description" class="form-control" rows="5"></textarea>
+                        <div id="description-error" class="error-message"></div>
+                    </div>
+
+                    <div class="field field--compact">
+                        <label for="regularPrice" class="form-label">Regular price (₹) <span
+                                class="required">*</span></label>
+                        <div class="input-prefix">
+                            <span>₹</span>
+                            <input placeholder="0.00" name="regularPrice" id="regularPrice" type="text"
+                                class="form-control">
+                        </div>
+                        <div id="regularPrice-error" class="error-message"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-card">
+                <div class="section-heading">
+                    <div class="section-number">02</div>
+                    <div>
+                        <h2>Variants and inventory</h2>
+                        <p>Add each available size and its stock quantity.</p>
+                    </div>
+                </div>
+
+                <div id="variant-section">
+                    <div class="variant-group" id="variant-1">
+                        <div class="variant-group__heading">
+                            <h3>Variant 1</h3>
+                            <span class="variant-tag">Default variant</span>
+                        </div>
+                        <div class="form-grid form-grid--two">
+                            <div class="field">
+                                <label class="form-label" for="variantSize1">Size <span
+                                        class="required">*</span></label>
+                                <input id="variantSize1" name="variantSize[]" type="text" class="form-control"
+                                    placeholder="e.g. M, L, XL">
+                                <div id="size-error-1" class="error-message"></div>
+                            </div>
+                            <div class="field">
+                                <label class="form-label" for="variantQuantity1">Quantity <span
+                                        class="required">*</span></label>
+                                <input id="variantQuantity1" name="variantQuantity[]" type="number" min="0"
+                                    class="form-control" placeholder="Enter stock quantity">
+                                <div id="quantity-error-1" class="error-message"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-outline-primary add-variant-btn" onclick="addVariant()">
+                    <span aria-hidden="true">＋</span> Add another variant
+                </button>
+            </section>
+
+            <section class="form-card">
+                <div class="section-heading">
+                    <div class="section-number">03</div>
+                    <div>
+                        <h2>Product images</h2>
+                        <p>Upload at least 3 images. You can preview and crop each image before publishing.</p>
+                    </div>
+                    <span class="section-meta">PNG / JPG / JPEG</span>
+                </div>
+
+                <div id="images-error" class="error-message images-error-message"></div>
+
+                <div class="selected-images-panel">
+                    <div class="selected-images-panel__heading">
+                        <h3>Selected images</h3>
+                        <p>Use the remove control to remove a thumbnail.</p>
+                    </div>
+                    <div id="addedImagesContainer" class="thumbnails-container">
+                        <p class="empty-thumbnails">Your selected image thumbnails will appear here.</p>
+                    </div>
+                </div>
+
+                <div class="image-grid">
+                    <article class="image-upload-card">
+                        <div class="image-upload-card__heading">
+                            <span class="image-index">Image 1</span>
+                            <span class="image-required">Required</span>
+                        </div>
+                        <label class="upload-label" for="input1">Choose image</label>
+                        <input class="form-control image-input" type="file" name="images" id="input1"
+                            accept="image/png, image/jpeg, image/jpg" onchange="viewImage(event, 1)">
+                        <div class="image-preview-row">
+                            <div class="preview-box">
+                                <span class="preview-caption">Original preview</span>
+                                <img src="" alt="Preview Image 1" id="imgView1">
+                                <span class="preview-placeholder">Choose an image to preview</span>
+                            </div>
+                            <div class="image-cropper preview-box" style="display:none;">
+                                <span class="preview-caption">Cropped preview</span>
+                                <img src="" id="croppedImg1" alt="Cropped Image 1">
+                            </div>
+                        </div>
+                        <button type="button" id="saveButton1" class="btn btn-primary image-save-btn">Save crop</button>
+                    </article>
+
+                    <article class="image-upload-card">
+                        <div class="image-upload-card__heading">
+                            <span class="image-index">Image 2</span>
+                            <span class="image-required">Required</span>
+                        </div>
+                        <label class="upload-label" for="input2">Choose image</label>
+                        <input class="form-control image-input" type="file" name="images" id="input2"
+                            accept="image/png, image/jpeg, image/jpg" onchange="viewImage(event, 2)">
+                        <div class="image-preview-row">
+                            <div class="preview-box">
+                                <span class="preview-caption">Original preview</span>
+                                <img src="" alt="Preview Image 2" id="imgView2">
+                                <span class="preview-placeholder">Choose an image to preview</span>
+                            </div>
+                            <div class="image-cropper preview-box" style="display:none;">
+                                <span class="preview-caption">Cropped preview</span>
+                                <img src="" id="croppedImg2" alt="Cropped Image 2">
+                            </div>
+                        </div>
+                        <button type="button" id="saveButton2" class="btn btn-primary image-save-btn">Save crop</button>
+                    </article>
+
+                    <article class="image-upload-card">
+                        <div class="image-upload-card__heading">
+                            <span class="image-index">Image 3</span>
+                            <span class="image-required">Required</span>
+                        </div>
+                        <label class="upload-label" for="input3">Choose image</label>
+                        <input class="form-control image-input" type="file" name="images" id="input3"
+                            accept="image/png, image/jpeg, image/jpg" onchange="viewImage(event, 3)">
+                        <div class="image-preview-row">
+                            <div class="preview-box">
+                                <span class="preview-caption">Original preview</span>
+                                <img src="" alt="Preview Image 3" id="imgView3">
+                                <span class="preview-placeholder">Choose an image to preview</span>
+                            </div>
+                            <div class="image-cropper preview-box" style="display:none;">
+                                <span class="preview-caption">Cropped preview</span>
+                                <img src="" id="croppedImg3" alt="Cropped Image 3">
+                            </div>
+                        </div>
+                        <button type="button" id="saveButton3" class="btn btn-primary image-save-btn">Save crop</button>
+                    </article>
+
+                    <article class="image-upload-card">
+                        <div class="image-upload-card__heading">
+                            <span class="image-index">Image 4</span>
+                            <span class="image-optional">Optional</span>
+                        </div>
+                        <label class="upload-label" for="input4">Choose image</label>
+                        <input class="form-control image-input" type="file" name="images" id="input4"
+                            accept="image/png, image/jpeg, image/jpg" onchange="viewImage(event, 4)">
+                        <div class="image-preview-row">
+                            <div class="preview-box">
+                                <span class="preview-caption">Original preview</span>
+                                <img src="" alt="Preview Image 4" id="imgView4">
+                                <span class="preview-placeholder">Choose an image to preview</span>
+                            </div>
+                            <div class="image-cropper preview-box" style="display:none;">
+                                <span class="preview-caption">Cropped preview</span>
+                                <img src="" id="croppedImg4" alt="Cropped Image 4">
+                            </div>
+                        </div>
+                        <button type="button" id="saveButton4" class="btn btn-primary image-save-btn">Save crop</button>
+                    </article>
+                </div>
+            </section>
+
+            <div class="publish-panel">
+                <div>
+                    <h2>Ready to publish?</h2>
+                    <p>Review the details above before adding this product to your catalog.</p>
+                </div>
+                <button class="btn btn-publish" type="submit">Publish product <span aria-hidden="true">→</span></button>
+            </div>
+        </form>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>
+    <script src="/js/admin/products/add-Product-Page.js"></script>
+
+    <%- include("../../views/partials/admin/footer") %>

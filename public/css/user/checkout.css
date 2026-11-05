@@ -1,0 +1,117 @@
+.container-form {
+    background: rgb(210, 214, 221);
+    max-width: 900px;
+    margin: auto;
+}
+
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 10px;
+    /* Added rounded corners */
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-body {
+    background-color: #e7e7e7d5;
+    border-radius: 10px;
+
+    padding: 20px;
+    /* Increased padding for better spacing */
+}
+
+.card-title {
+    font-size: 1.2rem;
+    /* Increased font size */
+    font-weight: bold;
+}
+
+.card-text {
+
+    font-size: 0.9rem;
+    /* Slightly smaller text */
+}
+
+.badge {
+    font-size: 1.1rem;
+    /* Increased size of the code badge */
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    margin-top: 10px;
+}
+
+.btn-outline-dark {
+    padding: 0px 6px;
+    /* Smaller padding to reduce button size */
+    font-weight: bold;
+    /* Bold text */
+    font-size: 0.85rem;
+    /* Slightly smaller font */
+    border-radius: 20px;
+    /* Rounded corners for the button */
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.btn-outline-success:hover {
+    background-color: #000000;
+    /* Lighter green */
+    color: white;
+    transform: scale(1.1);
+    /* Slight scaling effect on hover */
+}
+
+.btn-outline-success:active {
+    transform: scale(1);
+    /* Keep the size consistent when clicked */
+}
+
+.copy-btn-text {
+    font-weight: bold;
+    /* Bold text */
+    font-size: 1.2rem;
+    /* Larger font size for code visibility */
+    letter-spacing: 0.5px;
+    /* Slightly increased spacing between letters */
+}
+
+
+
+
+.form-control {
+    margin-bottom: 1rem;
+}
+
+.list-unstyled {
+    padding: 0;
+}
+
+.cart-detail ul {
+    padding-left: 0;
+    list-style: none;
+}
+
+.cart-detail li {
+    margin-bottom: 0.5rem;
+}
+
+.btn-block {
+    width: 100%;
+}
+
+.text-center {
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .form-group {
+        flex-direction: column;
+    }
+}

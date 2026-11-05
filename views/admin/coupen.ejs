@@ -1,0 +1,343 @@
+<%- include("../../views/partials/admin/header") %>
+
+
+    <head>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
+        <link rel="stylesheet" href="/css/admin/coupen.css">
+    </head>
+
+
+    <h1>Coupons Management</h1>
+
+
+    <!-- Modal for creating a new coupon -->
+    <!-- Coupon Modal -->
+    <div id="couponModal" class="modal">
+        <div class="modal-content coupon-modal-content">
+
+            <!-- Modal Header -->
+            <div class="coupon-modal-header">
+                <div>
+                    <h3 id="modalTitle">Create New Coupon</h3>
+                    <p>Configure your coupon details below.</p>
+                </div>
+
+                <button type="button" class="close" id="closeModalBtn">
+                    &times;
+                </button>
+            </div>
+
+            <form id="createCouponForm" action="/admin/coupons/create" method="POST" novalidate>
+
+                <input type="hidden" id="couponId" name="couponId">
+
+                <div class="coupon-form-grid">
+
+                    <!-- Coupon Code -->
+                    <div class="form-group full-width">
+                        <label for="code">Coupon Code</label>
+                        <input type="text" id="code" name="code" placeholder="Example: SAVE20" required />
+                        <small class="error-message" id="codeError"></small>
+                    </div>
+
+                    <!-- Discount -->
+                    <div class="form-group">
+                        <label for="discountPercentage">Discount Percentage (%)</label>
+                        <input type="number" id="discountPercentage" name="discountPercentage" min="1" max="100"
+                            placeholder="20" required />
+                        <small class="error-message" id="discountPercentageError"></small>
+                    </div>
+
+                    <!-- Quantity -->
+                    <div class="form-group">
+                        <label for="quantity">Coupon Quantity</label>
+                        <input type="number" id="quantity" name="quantity" min="1" placeholder="100" required />
+                        <small class="error-message" id="quantityError"></small>
+                    </div>
+
+                    <!-- Minimum Purchase -->
+                    <div class="form-group">
+                        <label for="minPurchaseAmount">Minimum Purchase (₹)</label>
+                        <input type="number" id="minPurchaseAmount" name="minPurchaseAmount" min="1" placeholder="500"
+                            required />
+                        <small class="error-message" id="minPurchaseAmountError"></small>
+                    </div>
+
+                    <!-- Maximum Purchase -->
+                    <div class="form-group">
+                        <label for="maxPurchaseAmount">Maximum Purchase (₹)</label>
+                        <input type="number" id="maxPurchaseAmount" name="maxPurchaseAmount" min="1" placeholder="5000"
+                            required />
+                        <small class="error-message" id="maxPurchaseAmountError"></small>
+                    </div>
+
+                    <!-- Start Date -->
+                    <div class="form-group">
+                        <label for="startDate">Start Date</label>
+                        <input type="date" id="startDate" name="startDate" required />
+                        <small class="error-message" id="startDateError"></small>
+                    </div>
+
+                    <!-- End Date -->
+                    <div class="form-group">
+                        <label for="endDate">End Date</label>
+                        <input type="date" id="endDate" name="endDate" required />
+                        <small class="error-message" id="endDateError"></small>
+                    </div>
+
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="coupon-modal-footer">
+                    <button type="button" class="cancel-btn" id="cancelCouponBtn">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="save-coupon-btn" id="submitCouponBtn">
+                        Create Coupon
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <hr />
+
+    <!-- List of all coupons -->
+    <div class="coupon-header">
+
+        <h3>All Coupons</h3>
+
+        <button class="open-modal-btn" id="openModalBtn">
+            + Create Coupon
+        </button>
+    </div>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Discount (%)</th>
+                <th>Min Purchase</th>
+                <th>Max Purchase</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Qty</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% coupons.forEach(coupon=> { %>
+                <tr>
+                    <td>
+                        <%= coupon.code %>
+                    </td>
+                    <td>
+                        <%= coupon.discountPercentage %>%
+                    </td>
+                    <td>₹<%= coupon.minPurchaseAmount %>
+                    </td>
+                    <td>₹<%= coupon.maxPurchaseAmount %>
+                    </td>
+                    <td>
+                        <%= coupon.startDate.toDateString() %>
+                    </td>
+                    <td>
+                        <%= coupon.endDate.toDateString() %>
+                    </td>
+                    <td>
+                        <%= coupon.quantity %>
+                    </td>
+                    <td>
+                        <button type="button" class="edit-btn" data-id="<%= coupon._id %>"
+                            data-code="<%= coupon.code %>" data-discount="<%= coupon.discountPercentage %>"
+                            data-min="<%= coupon.minPurchaseAmount %>" data-max="<%= coupon.maxPurchaseAmount %>"
+                            data-start="<%= coupon.startDate.toISOString().split('T')[0] %>"
+                            data-end="<%= coupon.endDate.toISOString().split('T')[0] %>"
+                            data-quantity="<%= coupon.quantity %>" onclick="editCoupon(this)">
+                            Edit
+                        </button>
+
+                        <form id="deleteForm-<%= coupon._id %>" action="/admin/deleteCoupons/<%= coupon._id %>"
+                            method="POST" style="display: inline;">
+                            <button type="button" onclick="confirmDelete('<%= coupon._id %>')">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                <% }) %>
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+
+            <% for (let i=1; i <=totalPages; i++) { %>
+
+                <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+
+                    <a class="page-link" href="?page=<%= i %>">
+                        <%= i %>
+                    </a>
+
+                </li>
+
+                <% } %>
+
+        </ul>
+    </nav>
+
+    <script>
+
+        function confirmDelete(couponId) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "This action cannot be undone!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "Cancel"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById(`deleteForm-${couponId}`).submit();
+                }
+            });
+        }
+
+        const modal = document.getElementById('couponModal');
+        openModalBtn.addEventListener('click', () => {
+            const form = document.getElementById("createCouponForm");
+
+            form.reset();
+            form.action = "/admin/coupons/create";
+
+            document.getElementById("couponId").value = "";
+
+            document.getElementById("modalTitle").textContent = "Create New Coupon";
+            document.getElementById("submitCouponBtn").textContent = "Create Coupon";
+
+            document.querySelectorAll(".error-message").forEach(msg => {
+                msg.textContent = "";
+                msg.style.display = "none";
+            });
+
+            form.querySelectorAll("input").forEach(input => {
+                input.classList.remove("invalid");
+            });
+
+            modal.style.display = "block";
+        });
+        const closeModalBtn = document.getElementById('closeModalBtn');
+
+        openModalBtn.addEventListener('click', () => modal.style.display = 'block');
+        closeModalBtn.addEventListener('click', () => modal.style.display = 'none');
+
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) modal.style.display = 'none';
+        });
+
+        document.getElementById("createCouponForm").addEventListener("submit", function (event) {
+            const form = event.target;
+
+            document.querySelectorAll(".error-message").forEach(msg => (msg.style.display = "none"));
+            form.querySelectorAll("input").forEach(input => input.classList.remove("invalid"));
+
+            let isValid = true;
+
+            const codeInput = document.getElementById("code");
+            if (!codeInput.value.trim()) {
+                displayError(codeInput, "Coupon code is required.");
+                isValid = false;
+            }
+
+            const discountInput = document.getElementById("discountPercentage");
+            if (!discountInput.value || discountInput.value <= 0 || discountInput.value > 100) {
+                displayError(discountInput, "Enter a valid discount percentage (1-100).");
+                isValid = false;
+            }
+
+            const minPurchaseInput = document.getElementById("minPurchaseAmount");
+            if (!minPurchaseInput.value || minPurchaseInput.value <= 0) {
+                displayError(minPurchaseInput, "Enter a valid minimum purchase amount.");
+                isValid = false;
+            }
+
+            const maxPurchaseInput = document.getElementById("maxPurchaseAmount");
+            if (!maxPurchaseInput.value || maxPurchaseInput.value <= 0) {
+                displayError(maxPurchaseInput, "Enter a valid minimum purchase amount.");
+                isValid = false;
+            }
+
+            const startDateInput = document.getElementById("startDate");
+            if (!startDateInput.value) {
+                displayError(startDateInput, "Start date is required.");
+                isValid = false;
+            }
+
+            const endDateInput = document.getElementById("endDate");
+            if (!endDateInput.value) {
+                displayError(endDateInput, "End date is required.");
+                isValid = false;
+            } else if (new Date(endDateInput.value) <= new Date(startDateInput.value)) {
+                displayError(endDateInput, "End date must be after the start date.");
+                isValid = false;
+            }
+
+            const quantityInput = document.getElementById("quantity");
+            if (!quantityInput.value || quantityInput.value <= 0) {
+                displayError(quantityInput, "Enter a valid coupon quantity.");
+                isValid = false;
+            }
+
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+
+        function displayError(input, message) {
+            const errorElement = input.nextElementSibling;
+            errorElement.textContent = message;
+            errorElement.style.display = "block";
+            input.classList.add("invalid");
+        }
+
+        function editCoupon(button) {
+
+            const coupon = button.dataset;
+
+            console.log(coupon);
+
+            const form = document.getElementById("createCouponForm");
+
+            // Change form action
+            form.action = `/admin/coupons/update/${coupon.id}`;
+
+            // Update modal heading
+            document.getElementById("modalTitle").textContent = "Edit Coupon";
+
+            document.getElementById("submitCouponBtn").textContent = "Update Coupon";
+
+            // Populate form fields
+            document.getElementById("couponId").value = coupon.id;
+            document.getElementById("code").value = coupon.code;
+            document.getElementById("discountPercentage").value = coupon.discount;
+            document.getElementById("minPurchaseAmount").value = coupon.min;
+            document.getElementById("maxPurchaseAmount").value = coupon.max;
+            document.getElementById("startDate").value = coupon.start;
+            document.getElementById("endDate").value = coupon.end;
+            document.getElementById("quantity").value = coupon.quantity;
+
+            // Open modal
+            modal.style.display = "block";
+        }
+
+    </script>
+
+
+
+    <%- include("../../views/partials/admin/footer") %>

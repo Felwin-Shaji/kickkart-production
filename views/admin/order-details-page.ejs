@@ -1,0 +1,151 @@
+<%- include("../../views/partials/admin/header") %>
+<style>
+
+  body{
+    background-color: #343a40
+  }
+    /* Modal background adjustments */
+    .modal-content {
+      border-radius: 10px;
+      box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
+      font-family: 'Arial', sans-serif;
+    }
+  
+    /* Header styles */
+    .modal-header {
+      background-color: #007bff;
+      color: #fff;
+      border-bottom: 1px solid #0056b3;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+  
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+  
+    /* Body styles */
+    .modal-body {
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+  
+    #orderDetailsContent {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #333;
+    }
+  
+    #orderDetailsContent ul {
+      padding-left: 20px;
+      margin: 10px 0;
+    }
+  
+    #orderDetailsContent ul li {
+      margin-bottom: 5px;
+    }
+  
+    /* Footer styles */
+    .modal-footer {
+      background-color: #f1f1f1;
+      border-top: 1px solid #ddd;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+    }
+  
+    .btn-close {
+      color: #fff;
+      opacity: 1;
+      text-shadow: none;
+      filter: none;
+    }
+  
+    /* Button styles */
+    .btn-secondary {
+      background-color: #6c757d;
+      border-color: #6c757d;
+    }
+  
+    .btn-secondary:hover {
+      background-color: #5a6268;
+      border-color: #545b62;
+    }
+  </style>
+  
+
+
+<div class="container my-4">
+    <h1 class="text-center text-primary mb-4">All Orders</h1>
+
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Date/Time</th>
+                            <th>User</th>
+                            <th>Total Amount</th>
+                            <!-- <th>Status</th> -->
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% orders.forEach(order=> { %>
+                            <tr>
+                              <td>
+                                <%= new Date(order.createdAt).toLocaleDateString('en-US') %> ,
+                                <%= new Date(order.createdAt).toLocaleTimeString('en-US') %>
+                              </td>
+                              
+
+                                <td><%= order.userId?.name %></td>
+                                <td>₹<%= order.totalAmount.toFixed(2) %></td>
+                                <!-- <td>
+                                    <span class="badge 
+                                        <%= order.status === 'Pending' ? 'bg-warning' : 
+                                            order.status === 'Shipped' ? 'bg-info' : 
+                                            order.status === 'Delivered' ? 'bg-success' : 
+                                            'bg-danger' %>">
+                                        <%= order.status %>
+                                    </span>
+                                </td> -->
+                                <td>
+                                    <!-- View Details Button -->
+                                    <a href="/admin/orders/<%=order._id %>" 
+                                    class="btn btn-outline-primary btn-sm" >
+                                    View Details
+                                 </a>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="  align-items- mt-3">
+  <!-- <p>Page <%= currentPage %> of <%= totalPages %></p> -->
+  <nav>
+    <nav aria-label="Page navigation">
+      <ul class="pagination justify-content-center">
+          <% for (let i=1; i <=totalPages; i++) { %>
+              <li class="page-item <%=(i === currentPage) ? 'active' : '' %>">
+                  <a class="page-link" href="?page=<%= i %>">
+                      <%= i %>
+                  </a>
+              </li>
+              <% } %>
+      </ul>
+  </nav>
+  </nav>
+</div>
+
+
+  
+
+<%- include("../../views/partials/admin/footer") %>

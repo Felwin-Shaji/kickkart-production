@@ -1,0 +1,148 @@
+<%- include("../../views/partials/admin/header") %>
+
+    <head>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/css/admin/product/product-page.css">
+    </head>
+
+    <body>
+        <div class="container">
+            <!-- Header Section -->
+            <div class="text-center mb-4">
+                <h2 class="content-title">Products</h2>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="d-flex justify-content-center mb-4">
+                <form action="" method="get" class="w-100" style="max-width: 600px;">
+                    <div class="input-group input-group-sm">
+                        <input type="text" class="form-control border-0" placeholder="Search products or brands"
+                            name="search">
+                        <button class="btn btn-success" type="submit">Search</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Products Table -->
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Brand</th>
+                            <th>Category</th>
+                            <th>Sale Price</th>
+                            <th>Offer Price</th>
+                            <th>Offer</th>
+                            <th>Quantity</th>
+                            <th>Action</th>
+                            <th>Edit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for (let i=0; i < data.length; i++) { %>
+                            <tr>
+                                <td>
+                                    <%= data[i].productName %>
+                                </td>
+                                <td>
+                                    <%= data[i].brand %>
+                                </td>
+                                <td>
+                                    <%= data[i].category.name %>
+                                </td>
+                                <td>
+                                    ₹<%= data[i].salePrice %>
+                                </td>
+                                <td>
+                                    <%= data[i].isOfferActive%>%
+                                </td>
+                                <td>
+                                    <!-- Add Offer Button -->
+                                    <button class="btn btn-info" data-bs-toggle="modal"
+                                        data-bs-target="#addOfferModal<%= data[i]._id %>">
+                                        Edit Offer
+                                    </button>
+
+                                </td>
+
+                                <td>
+                                    <%= data[i].variants.reduce((acc,num)=>{return acc+=num.quantity},0)%>
+                                </td>
+                                <td>
+                                    <% if (!data[i].isBlocked) { %>
+                                        <button class="btn btn-danger"
+                                            onclick="confirmAction('<%= data[i]._id %>', 'block')">
+                                            Block
+                                        </button>
+                                        <% } else { %>
+                                            <button class="btn btn-success"
+                                                onclick="confirmAction('<%= data[i]._id %>', 'unblock')">
+                                                Unblock
+                                            </button>
+                                            <% } %>
+                                </td>
+                                <td>
+                                    <button class="btn btn-info">
+                                        <a href="/admin/editProduct?_id=<%=data[i]._id %>" class="text-white">Edit</a>
+                                    </button>
+                                </td>
+                            </tr>
+                            <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+
+            <% for (let i=0; i < data.length; i++) { %>
+                <!-- Add Offer Modal -->
+                <div class="modal fade" id="addOfferModal<%= data[i]._id %>" tabindex="-1"
+                    aria-labelledby="addOfferLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="addOfferLabel">Edit Offer for <%= data[i].productName %>
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="offerForm<%= data[i]._id %>">
+                                    <div class="mb-3">
+                                        <label for="offerInput<%= data[i]._id %>" class="form-label">Enter Offer
+                                            (%)</label>
+                                        <input type="number" class="form-control" id="offerInput<%= data[i]._id %>"
+                                            value="<%=data[i].isOfferActive %>" min="0" max="100" step="1" required>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary"
+                                    onclick="submitOffer('<%= data[i]._id %>')">Save Offer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+                    <!-- Pagination -->
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            <% for (let i=1; i <=totalPages; i++) { %>
+                                <li class="page-item <%=(i === currentPage) ? 'active' : '' %>">
+                                    <a class="page-link" href="?page=<%= i %>">
+                                        <%= i %>
+                                    </a>
+                                </li>
+                                <% } %>
+                        </ul>
+                    </nav>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script src="/js/admin/products/product-page.js"></script>
+
+        <%- include("../../views/partials/admin/footer") %>
+    </body>

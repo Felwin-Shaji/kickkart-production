@@ -1,0 +1,201 @@
+<%- include("../partials/user/header.ejs") -%>
+    <link rel="stylesheet" href="/css/user/checkout.css">
+
+    <div class="breadcrumbs">
+        <div class="container">
+            <div class="row">
+                <!-- <div class="col"> -->
+                <p class="bread"><span><a href="/">Home</a></span> / <span>Checkout</span></p>
+                <!-- </div> -->
+            </div>
+        </div>
+    </div>
+
+
+    <div class="colorlib-product">
+        <div class="container-form">
+
+            <!-- Coupon Section -->
+            <div class="row">
+
+                <div class="col-md-12 ">
+                    <form id="couponForm" onsubmit="applyCoupon(event)">
+                        <div class="row form-group align-items-center" style="margin: 20px;">
+                            <div class="col-sm-12">
+                                <div class="mt-4">
+                                    <a href="#" id="showCouponsToggle" class="btn btn-link">Available Coupons - See
+                                        Here</a>
+                                </div>
+
+                                <div id="couponsContainer" class="container my-4" style="display: none;">
+                                    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+                                        <% coupons.forEach(coupon=> { %>
+                                            <div class="col">
+                                                <div class="card shadow-lg rounded-3 h-100 border-0">
+                                                    <div class="card-body text-center p-4">
+                                                        <h5 class="card-title text-uppercase text-dark">
+                                                            Save <span class="text-success fw-bold">
+                                                                <%= coupon.discountPercentage %>%
+                                                            </span>
+                                                        </h5>
+                                                        <p class="card-text text-muted mb-2">Min Purchase: ₹<%=
+                                                                coupon.minPurchaseAmount %>
+                                                        </p>
+                                                        <p class="card-text text-muted mb-2">Max Purchase: ₹<%=
+                                                                coupon.maxPurchaseAmount %>
+                                                        </p>
+                                                        <p class="text-muted small">
+                                                            Valid: <%= new Date(coupon.startDate).toLocaleDateString()
+                                                                %> -
+                                                                <%= new Date(coupon.endDate).toLocaleDateString() %>
+                                                        </p>
+                                                        <span class="badge bg-success text-white px-3 py-2 mb-3">
+                                                            Code: <span class="copy-btn-text">
+                                                                <%= coupon.code %>
+                                                            </span>
+                                                        </span>
+
+                                                        <!-- Copy Button -->
+                                                        <button class="btn btn-outline-dark btn-sm"
+                                                            data-clipboard-text="<%= coupon.code %>"
+                                                            id="copyButton<%= coupon._id %>">
+                                                            Copy Code
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <% }) %>
+                                    </div>
+                                </div>
+
+                                <input type="text" id="couponNumber" name="couponNumber"
+                                    class="form-control input-number" placeholder="Your Coupon Number..." required>
+
+                                <small id="errorMessage" style="color: red; display: none;">Please enter a valid coupon
+                                    number.</small>
+                                <input id="totalAmountBfrCoupn" name="totalAmountBfrCoupn" type="number" value="<%= cart.items.reduce((total, item)=> total +
+                                                (item.product.salePrice * item.quantity), 0).toFixed(2) %>" hidden>
+                                <div id="responseMessage" style="margin-top: 20px; display: none;"></div>
+                            </div>
+                            <div class="col-sm-6">
+                                <button type="submit" id="applyCouponButton" class="btn btn-primary btn-block">Apply
+                                    Coupon</button>
+                                <button type="button" id="removeCouponButton" class="btn btn-danger btn-block"
+                                    style="display: none;">Remove Coupon</button>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- </div> -->
+
+            <div class="row ">
+                <div class="col-lg-11" style="margin: 20px;">
+                    <!-- Billing Details -->
+                    <form id="orderForm" class="colorlib-form">
+                        <h2 class="mb-3">Billing Details</h2>
+                        <div class="form-group">
+                            <label for="savedAddresses">Select a Saved Address</label>
+                            <select name="selectedAddress" id="savedAddresses" class="form-control">
+                                <% userAddress.forEach((addresses)=> { %>
+                                    <option value="<%= addresses._id %>">
+                                        <%= `${addresses.name} - ${addresses.addressType}, ${addresses.city},
+                                            ${addresses.landMark}, ${addresses.state}, ${addresses.pincode}` %>
+                                    </option>
+                                    <% }); %>
+                            </select>
+                        </div>
+                        <div>
+                            <a href="/addAddress?redirectTo=checkout" class="btn col-lg-4 btn-primary btn-block">Add
+                                Address</a>
+                        </div>
+
+                        <!-- Cart Details -->
+                        <div class="cart-detail mt-4">
+                            <h2>Cart Total</h2>
+                            <ul class="list-unstyled">
+                                <li class="d-flex justify-content-between">
+                                    <span>Subtotal</span>
+                                    <span>₹<%= cart.items.reduce((total, item)=> total + (item.product.salePrice *
+                                            item.quantity), 0).toFixed(2) %></span>
+                                </li>
+                                <ul>
+                                    <% cart.items.forEach((item)=> { %>
+                                        <li class="d-flex justify-content-between">
+                                            <span>
+                                                <%= item.quantity %> x <%= item.product.productName %> (size: <%=
+                                                            item.size %>)
+                                            </span>
+                                            <span>₹<%= (item.product.salePrice * item.quantity).toFixed(2) %></span>
+                                        </li>
+                                        <% }); %>
+                                </ul>
+                                <li class="d-flex justify-content-between">
+                                    <span>Shipping</span>
+                                    <span>₹00.00</span>
+                                </li>
+                                <li class="d-flex justify-content-between">
+                                    <span>Coupon offer</span>
+                                    <span id="couponOffer">₹00.00</span>
+                                </li>
+                                <li class="d-flex justify-content-between font-weight-bold">
+                                    <span>Order Total</span>
+                                    <span id="orderTotal">₹<%= cart.items.reduce((total, item)=> total +
+                                            (item.product.salePrice * item.quantity), 0).toFixed(2) %></span>
+
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Payment Methods -->
+                        <div class="cart-detail mt-4">
+                            <h2>Payment Method</h2>
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input type="radio" name="paymentMethod" value="COD" class="form-check-input">
+                                        COD
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input type="radio" name="paymentMethod" value="Online"
+                                            class="form-check-input"> Online
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input type="radio" name="paymentMethod" value="Wallet"
+                                            class="form-check-input"> Wallet
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <input id="coupenCode" name="coupenCode" type="text" value="" hidden>
+                        <input id="totalAmount" name="totalAmount" type="number"
+                            value="<%= cart.items.reduce((total, item)=> total + (item.product.salePrice * item.quantity), 0).toFixed(2) %>"
+                            readonly hidden>
+
+                        <input id="coupenOfferPrice" name="coupenOffer" type="number" value="0" readonly hidden>
+
+
+
+                        <input id="totalregularPrice" name="totalregularPrice" type="number" value="<%= cart.items.reduce((total, item)=> total +
+                                                (item.product.regularPrice * item.quantity), 0).toFixed(2) %>" hidden>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-block">Place an Order</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+        <%- include("../partials/user/footer.ejs") -%>
+            <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+            <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js"></script>
+            <script src="/js/user/checkout.js"></script>
