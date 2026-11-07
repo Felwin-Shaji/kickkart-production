@@ -11,8 +11,8 @@ const userAuth = (req, res, next) => {
             }
         })
         .catch(error => {
-            console.error('Error in user auth middleware:', error);  
-            res.status(500).send('Internal server error');  
+            console.error('Error in user auth middleware:', error);
+            res.status(500).send('Internal server error');
         });
 };
 
@@ -31,6 +31,8 @@ const adminAuth = (req, res, next) => {
                 console.log("error in admin auth middle ware");
                 res.status(500).send("Internal Server Error")
             })
+    } else {
+        return res.redirect("/admin/login");
     }
 }
 

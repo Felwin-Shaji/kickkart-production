@@ -1,3 +1,5 @@
+const { STATUS_CODE } = require("../../constants/StatusCode");
+const { ADMIN_MESSAGES } = require("../../constants/messages/AdminMessages");
 const Order = require("../../models/orderSchema");
 const { find } = require("../../models/userSchema");
 
@@ -24,7 +26,7 @@ const getOrder = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Error at getOrder", error);
+        console.error(ADMIN_MESSAGES.GET_ORDER_ERROR, error);
         res.redirect("/admin/errorPage");
     }
 };
@@ -40,7 +42,7 @@ const orderDetails = async (req, res) => {
 
 
         if (!order) {
-            return res.status(404).json({ error: "Order not found" });
+            return res.status(STATUS_CODE.NOT_FOUND).json({ error: ADMIN_MESSAGES.ORDER_NOT_FOUND });
         }
 
         res.render("view-orderFull-DetailsPage", {
@@ -48,7 +50,7 @@ const orderDetails = async (req, res) => {
         })
 
     } catch (error) {
-        console.error("Error fetching order:", error);
+        console.error(ADMIN_MESSAGES.ERROR_FETCHING_ORDER, error);
         res.redirect("/admin/errorPage");
     }
 }
@@ -58,8 +60,8 @@ const apdateStatus = async (req, res) => {
         const { orderId, productId} = req.params;
         const newStatus = req.body.status; 
 
-        console.log("req.params",req.params);
-         console.log("newStatus",newStatus)
+        // req.params,req.params);
+        //  newStatus,newStatus)
         
         // Update the order's status
         const updatedOrder = await Order.findOneAndUpdate(
@@ -73,15 +75,15 @@ const apdateStatus = async (req, res) => {
             { new: true } 
         );
 
-        //console.log("updatedOrder",updatedOrder);
+        //updatedOrder,updatedOrder);
         
         if (!updatedOrder) {
-            return res.status(404).send("Order not found.");
+            return res.status(STATUS_CODE.NOT_FOUND).send(ADMIN_MESSAGES.ORDER_NOT_FOUND_2);
         }
 
         res.redirect(`/admin/orders/${orderId}`);
     } catch (error) {
-        console.error("Error updating order status:", error);
+        console.error(ADMIN_MESSAGES.ERROR_UPDATING_ORDER_STATUS, error);
         res.redirect("/admin/errorPage");
     }
 };

@@ -1,3 +1,5 @@
+const { STATUS_CODE } = require("../../constants/StatusCode");
+const { COMMON_MESSAGES } = require("../../constants/messages/CommonMessages");
 const User = require("../../models/userSchema");
 const Address = require("../../models/addressSchema");
 const Order = require("../../models/orderSchema")
@@ -39,13 +41,13 @@ const sendVerificationEmail = async (email, otp) => {
 
       if (info.accepted.length > 0) {
          console.log(`Verification email sent successfully to ${email}`);
-         return { success: true, message: "Email sent successfully" };
+         return { success: true, message: COMMON_MESSAGES.EMAIL_SENT_SUCCESSFULLY };
       } else {
-         console.warn(`Failed to send verification email to ${email}`);
-         return { success: false, message: "Email not accepted by recipient server" };
+         console.warn(`${COMMON_MESSAGES.FAILED_TO_SEND_VERIFICATION_EMAIL_TO} ${email}`);
+         return { success: false, message: COMMON_MESSAGES.EMAIL_NOT_ACCEPTED_BY_RECIPIENT_SERVER };
       }
    } catch (error) {
-      console.error("Error in sending verification OTP email:", {
+      console.error(COMMON_MESSAGES.ERROR_IN_SENDING_VERIFICATION_OTP_EMAIL, {
          message: error.message,
          stack: error.stack,
       });
@@ -58,7 +60,7 @@ const securePassword = async (password) => {
       const passwordHash = await bcrypt.hash(password, 10)
       return passwordHash
    } catch (error) {
-      console.log('Errorn occured while hashing the password')
+      console.log(COMMON_MESSAGES.PASSWORD_HASHING_ERROR)
    }
 }
 
@@ -66,7 +68,7 @@ const getForgotPassWordPage = async (req, res) => {
    try {
       res.render("auth/forgot-password-page")
    } catch (error) {
-      console.log("getForgotPassWordPage error", error)
+      console.log(COMMON_MESSAGES.GETFORGOTPASSWORDPAGE_ERROR, error)
       res.redirect("auth/pageNotFound")
    }
 };
@@ -78,22 +80,22 @@ const forgotEmailVarifiation = async (req, res) => {
 
       if (findUser) {
          const otp = generateOtp();
-         console.log('otp in forgotEmailVarifiation', otp);
+         // otp in forgotEmailVarifiation, otp);
          const emailSent = await sendVerificationEmail(email, otp);
          if (emailSent) {
             req.session.userOtp = otp;
             req.session.email = email;
             res.json({
                success: true,
-               message: "OTP sent successfully. Please verify.",
+               message: COMMON_MESSAGES.OTP_SENT_SUCCESSFULLY_PLEASE_VERIFY,
                redirectUrl: '/Verify-OTP-page'
             });
          } else {
-            res.json({ success: false, message: "failed to send OTP. Please try again" })
+            res.json({ success: false, message: COMMON_MESSAGES.FAILED_TO_SEND_OTP_PLEASE_TRY_AGAIN })
          }
       } else {
          res.render("auth/forgot-password-page", {
-            message: "User with this email does not exist"
+            message: COMMON_MESSAGES.USER_WITH_THIS_EMAIL_DOES_NOT_EXIST
          })
       }
 
@@ -116,10 +118,10 @@ const verifyOtp = async (req, res) => {
       if (otp === req.session.userOtp) {
          res.json({ success: true, redirectUrl: "/reset-password" })
       } else {
-         res.json({ success: false, message: "OTP not matching" });
+         res.json({ success: false, message: COMMON_MESSAGES.OTP_NOT_MATCHING });
       }
    } catch (error) {
-      res.status(500).json({ success: false, message: "an Error Occured Please try again" });
+      res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).json({ success: false, message: COMMON_MESSAGES.AN_ERROR_OCCURED_PLEASE_TRY_AGAIN });
    }
 }
 
@@ -132,11 +134,11 @@ const resendOtp = async (req, res) => {
       console.log(`resend OTP :${otp} to ${email}`);
       const emailSent = await sendVerificationEmail(email, otp);
       if (emailSent) {
-         res.status(200).json({ success: true, message: "OTP resented sucessfully" })
+         res.status(STATUS_CODE.OK).json({ success: true, message: COMMON_MESSAGES.OTP_RESENT_SUCCESSFULLY })
       }
    } catch (error) {
-      console.log("Error in resend OTP", error);
-      res.status(500).json({ success: false, message: "Internel server error" })
+      console.log(COMMON_MESSAGES.ERROR_IN_RESEND_OTP, error);
+      res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).json({ success: false, message: COMMON_MESSAGES.INTERNEL_SERVER_ERROR })
 
    }
 }
@@ -162,31 +164,31 @@ const resetPassword = async (req, res) => {
          )
          res.redirect("/login");
       } else {
-         res.render("profile/reset-password", { message: 'password does not match' })
+         res.render("profile/reset-password", { message: COMMON_MESSAGES.PASSWORD_DOES_NOT_MATCH })
       }
 
    } catch (error) {
-      console.log('Error occured at resetPassword function', error);
+      console.log(COMMON_MESSAGES.ERROR_OCCURED_AT_RESETPASSWORD_FUNCTION, error);
       res.redirect("/pageNotFound")
    }
 }
 
 const userProfile = async (req, res) => {
    try {
-      console.log('Session User:', req.session.user);
+      // Session User:, req.session.user);
       const userId = req.session.user;
 
       const userData = await User.findById(userId);
 
       if (!userData) {
-         console.error("User not found for ID:", userId);
-         return res.status(404).json({ success: false, message: "User not found" });
+         console.error(COMMON_MESSAGES.USER_NOT_FOUND_FOR_ID, userId);
+         return res.status(STATUS_CODE.NOT_FOUND).json({ success: false, message: COMMON_MESSAGES.USER_NOT_FOUND });
       }
 
       if (!userData.wallet) {
          userData.wallet = { balance: 0, transactions: [] };
          await userData.save();
-         console.log("Wallet created for user:", userId);
+         // Wallet created for user:, userId);
       }
 
       const addressData = await Address.findOne({ userId: userId });
@@ -195,9 +197,9 @@ const userProfile = async (req, res) => {
 
       const walletHistory = userData.wallet.transactions || [];
 
-      console.log("userData", userData);
-      console.log("orderData", orderData);
-      console.log("walletHistory", walletHistory);
+      // userData, userData);
+      // orderData, orderData);
+      // walletHistory, walletHistory);
 
       res.render("profile/profile-page", {
          user: userData,
@@ -207,7 +209,7 @@ const userProfile = async (req, res) => {
       })
 
    } catch (error) {
-      console.error("Error retrieving profile data:", error);
+      console.error(COMMON_MESSAGES.ERROR_RETRIEVING_PROFILE_DATA, error);
       res.redirect("/pageNotFound");
    }
 };
@@ -219,16 +221,16 @@ const editProfile = async (req, res) => {
       const { name, phone } = req.body;
 
       if (!userId) {
-         return res.status(400).json({ message: "User not found." });
+         return res.status(STATUS_CODE.BAD_REQUEST).json({ message: COMMON_MESSAGES.USER_NOT_FOUND_3 });
       }
 
       if (!name || !phone) {
-         return res.status(400).json({ message: "Name and phone must not be empty." });
+         return res.status(STATUS_CODE.BAD_REQUEST).json({ message: COMMON_MESSAGES.NAME_AND_PHONE_MUST_NOT_BE_EMPTY });
       }
 
       const phoneRegex = /^[0-9]{10}$/;
       if (!phoneRegex.test(phone)) {
-         return res.status(400).json({ message: "Phone number must be a valid 10-digit number." });
+         return res.status(STATUS_CODE.BAD_REQUEST).json({ message: COMMON_MESSAGES.PHONE_NUMBER_MUST_BE_A_VALID_10_DIGIT_NUMBER });
       }
 
       const user = await User.findOneAndUpdate(
@@ -238,18 +240,18 @@ const editProfile = async (req, res) => {
       );
 
       if (!user) {
-         return res.status(404).json({ message: "User not found or update failed." });
+         return res.status(STATUS_CODE.NOT_FOUND).json({ message: COMMON_MESSAGES.USER_NOT_FOUND_OR_UPDATE_FAILED });
       }
 
-      return res.status(200).json({
-         message: "Profile updated successfully.",
+      return res.status(STATUS_CODE.OK).json({
+         message: COMMON_MESSAGES.PROFILE_UPDATED_SUCCESSFULLY,
          user,
       });
 
    } catch (error) {
-      console.error("Error updating profile:", error);
+      console.error(COMMON_MESSAGES.ERROR_UPDATING_PROFILE, error);
 
-      return res.status(500).json({ message: "An internal server error occurred. Please try again later." });
+      return res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).json({ message: COMMON_MESSAGES.AN_INTERNAL_SERVER_ERROR_OCCURRED_PLEASE_TRY_AGAIN_LATER });
    }
 };
 
@@ -259,21 +261,21 @@ const changePassword = async (req, res) => {
       const { currPassword, password, confirmPassword } = req.body
 
       if (!currPassword || !password || !confirmPassword) {
-         return res.status(400).json({ success: false, message: "All fields are required" });
+         return res.status(STATUS_CODE.BAD_REQUEST).json({ success: false, message: COMMON_MESSAGES.ALL_FIELDS_ARE_REQUIRED });
       }
 
       if (password !== confirmPassword) {
-         return res.status(400).json({ success: false, message: "Passwords do not match" });
+         return res.status(STATUS_CODE.BAD_REQUEST).json({ success: false, message: COMMON_MESSAGES.PASSWORDS_DO_NOT_MATCH });
       }
 
       const user = await User.findById(userId);
       if (!user) {
-         return res.status(404).json({ success: false, message: "User not found" });
+         return res.status(STATUS_CODE.NOT_FOUND).json({ success: false, message: COMMON_MESSAGES.USER_NOT_FOUND });
       }
 
       const isMatch = await bcrypt.compare(currPassword, user.password);
       if (!isMatch) {
-         return res.status(401).json({ success: false, message: "Current password is incorrect" });
+         return res.status(STATUS_CODE.UNAUTHORIZED).json({ success: false, message: COMMON_MESSAGES.CURRENT_PASSWORD_IS_INCORRECT });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -281,12 +283,12 @@ const changePassword = async (req, res) => {
       user.password = hashedPassword;
       await user.save();
 
-      res.status(200).json({ success: true, message: "Password updated successfully" });
+      res.status(STATUS_CODE.OK).json({ success: true, message: COMMON_MESSAGES.PASSWORD_UPDATED_SUCCESSFULLY });
 
    } catch (error) {
 
-      console.error("Error changing password:", error);
-      res.status(500).json({ message: "Internal server error" });
+      console.error(COMMON_MESSAGES.ERROR_CHANGING_PASSWORD, error);
+      res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).json({ message: COMMON_MESSAGES.INTERNAL_SERVER_ERROR_2 });
 
    }
 }
@@ -327,7 +329,7 @@ const addAddress = async (req, res) => {
       }
 
    } catch (error) {
-      console.error("Error adding address:", error);
+      console.error(COMMON_MESSAGES.ERROR_ADDING_ADDRESS, error);
       res.redirect("/pageNotFound");
    }
 }
@@ -355,7 +357,7 @@ const getEditAddress = async (req, res) => {
       res.render("profile/edit-address", { address: addressData, user: user })
 
    } catch (error) {
-      console.log("Error on getEditAddress function :", error);
+      console.log(COMMON_MESSAGES.ERROR_ON_GETEDITADDRESS_FUNCTION, error);
       res.redirect("/pageNotFound")
 
    }
@@ -392,7 +394,7 @@ const editAddress = async (req, res) => {
 
       res.redirect("/userProfile");
    } catch (error) {
-      console.log("Error in editAddress function :", error);
+      console.log(COMMON_MESSAGES.ERROR_IN_EDITADDRESS_FUNCTION, error);
       res.redirect("/pageNotFound")
 
    }
@@ -404,7 +406,7 @@ const deleteAddress = async (req, res) => {
       const addressId = req.query.id;
       const findAddress = await Address.findOne({ "address._id": addressId })
       if (!findAddress) {
-         return res.status(404).send("address not found ")
+         return res.status(STATUS_CODE.NOT_FOUND).send(COMMON_MESSAGES.ADDRESS_NOT_FOUND)
       }
 
       await Address.updateOne(
@@ -415,7 +417,7 @@ const deleteAddress = async (req, res) => {
       res.redirect("/userProfile")
 
    } catch (error) {
-      console.error("Error in deleteAddress function :", error);
+      console.error(COMMON_MESSAGES.ERROR_IN_DELETEADDRESS_FUNCTION, error);
       res.redirect("/pageNotFound")
    }
 

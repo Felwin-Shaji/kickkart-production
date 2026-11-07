@@ -1,3 +1,5 @@
+const { STATUS_CODE } = require("../../constants/StatusCode");
+const { ADMIN_MESSAGES } = require("../../constants/messages/AdminMessages");
 const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
 const Brand = require("../../models/brandSchema");
@@ -19,7 +21,7 @@ const getAddProduct = async (req, res) => {
         });
 
     } catch (error) {
-        console.log('Error in getAddProduct page');
+        console.log(ADMIN_MESSAGES.ERROR_IN_GETADDPRODUCT_PAGE);
         res.redirect("/admin/errorPage");
     }
 
@@ -30,7 +32,7 @@ const addProducts = async (req, res) => {
         // Validate request body fields
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ message: "Validation failed", errors: errors.array() });
+            return res.status(STATUS_CODE.BAD_REQUEST).json({ message: ADMIN_MESSAGES.VALIDATION_FAILED, errors: errors.array() });
         }
 
         const {
@@ -45,35 +47,35 @@ const addProducts = async (req, res) => {
 
         // Check if required fields are empty
         if (!productName || !brand || !description || !regularPrice || !category || !variantSize || !variantQuantity) {
-            return res.status(400).json({ message: "All fields are required." });
+            return res.status(STATUS_CODE.BAD_REQUEST).json({ message: ADMIN_MESSAGES.ALL_FIELDS_ARE_REQUIRED_2 });
         }
 
         // Ensure price is a valid number
         if (isNaN(regularPrice) || parseFloat(regularPrice) <= 0) {
-            return res.status(400).json({ message: "Regular price must be a valid positive number." });
+            return res.status(STATUS_CODE.BAD_REQUEST).json({ message: ADMIN_MESSAGES.REGULAR_PRICE_MUST_BE_A_VALID_POSITIVE_NUMBER });
         }
 
         // Check if product already exists
         const productExists = await Product.findOne({ productName });
         if (productExists) {
-            return res.status(400).json({ message: "Product already exists, please try another name." });
+            return res.status(STATUS_CODE.BAD_REQUEST).json({ message: ADMIN_MESSAGES.PRODUCT_ALREADY_EXISTS_PLEASE_TRY_ANOTHER_NAME });
         }
 
         // Check for valid category
         const categoryDoc = await Category.findOne({ name: category });
         if (!categoryDoc) {
-            return res.status(400).json({ message: "Invalid category name." });
+            return res.status(STATUS_CODE.BAD_REQUEST).json({ message: ADMIN_MESSAGES.INVALID_CATEGORY_NAME });
         }
 
         // Validate variants (ensure arrays are not empty and values are valid)
         if (!Array.isArray(variantSize) || !Array.isArray(variantQuantity) || variantSize.length === 0) {
-            return res.status(400).json({ message: "At least one variant is required." });
+            return res.status(STATUS_CODE.BAD_REQUEST).json({ message: ADMIN_MESSAGES.AT_LEAST_ONE_VARIANT_IS_REQUIRED });
         }
 
         const variants = variantSize.map((size, index) => {
             const quantity = parseInt(variantQuantity[index], 10);
             if (!size || isNaN(quantity) || quantity < 0) {
-                throw new Error(`Invalid variant data at index ${index + 1}.`);
+                throw new Error(ADMIN_MESSAGES.INVALID_VARIANT_DATA_AT_INDEX.replace("{index}", index + 1));
             }
             return { size, quantity };
         });
@@ -92,7 +94,7 @@ const addProducts = async (req, res) => {
                 images.push(file.filename);
             }
         } else {
-            return res.status(400).json({ message: "At least three product image is required." });
+            return res.status(STATUS_CODE.BAD_REQUEST).json({ message: ADMIN_MESSAGES.AT_LEAST_THREE_PRODUCT_IMAGE_IS_REQUIRED });
         }
 
         // Create and save new product
@@ -110,15 +112,15 @@ const addProducts = async (req, res) => {
 
         await newProduct.save();
 
-        return res.status(201).json({
+        return res.status(STATUS_CODE.CREATED).json({
             success: true,
-            message: "Product added successfully!",
+            message: ADMIN_MESSAGES.PRODUCT_ADDED_SUCCESSFULLY,
             redirectUrl: "/admin/products"
         });
 
     } catch (error) {
-        console.error("Error saving product:", error);
-        res.status(500).json({ message: error.message });
+        console.error(ADMIN_MESSAGES.ERROR_SAVING_PRODUCT, error);
+        res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
 };
 
@@ -142,7 +144,7 @@ const getAllProducts = async (req, res) => {
             .skip((page - 1) * limit)
             .populate("category")
             .exec();
-        // console.log("111111", productData)
+        // 111111, productData)
 
         const count = await Product.countDocuments(productQuery);
 
@@ -162,7 +164,7 @@ const getAllProducts = async (req, res) => {
             res.redirect("/pageNotFound");
         }
     } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error(ADMIN_MESSAGES.ERROR_FETCHING_PRODUCTS, error);
         res.redirect("/admin/errorPage");
     }
 };
@@ -176,7 +178,7 @@ const blockProduct = async (req, res) => {
 
         res.redirect("/admin/products")
     } catch (error) {
-        console.log("error on the blockProduct function")
+        console.log(ADMIN_MESSAGES.ERROR_ON_THE_BLOCKPRODUCT_FUNCTION)
         res.redirect("/admin/errorPage");
     }
 }
@@ -189,7 +191,7 @@ const unBlockProduct = async (req, res) => {
 
         res.redirect("/admin/products")
     } catch (error) {
-        console.log("Error on the unBlockProduct function")
+        console.log(ADMIN_MESSAGES.ERROR_ON_THE_UNBLOCKPRODUCT_FUNCTION)
         res.redirect("/admin/errorPage");
     }
 }
@@ -209,7 +211,7 @@ const getEditProduct = async (req, res) => {
         })
 
     } catch (error) {
-        console.log("error at getEditProduct", error)
+        console.log(ADMIN_MESSAGES.GET_EDIT_PRODUCT_ERROR, error)
         res.redirect("/admin/errorPage");
     }
 }
@@ -225,17 +227,17 @@ const editProduct = async (req, res) => {
         });
 
         if (existingProduct) {
-            return res.status(400).json({ error: "Product with this name already exists. Please try another name." });
+            return res.status(STATUS_CODE.BAD_REQUEST).json({ error: ADMIN_MESSAGES.PRODUCT_WITH_THIS_NAME_ALREADY_EXISTS_PLEASE_TRY_ANOTHER_NAME });
         }
 
         const category = await Category.findOne({ name: data.category });
         if (!category) {
-            return res.status(400).json({ error: "Invalid category name." });
+            return res.status(STATUS_CODE.BAD_REQUEST).json({ error: ADMIN_MESSAGES.INVALID_CATEGORY_NAME });
         }
 
         const product = await Product.findById(id);
         if (!product) {
-            return res.status(404).json({ error: "Product not found." });
+            return res.status(STATUS_CODE.NOT_FOUND).json({ error: ADMIN_MESSAGES.PRODUCT_NOT_FOUND });
         }
 
         const images = [];
@@ -272,26 +274,26 @@ const editProduct = async (req, res) => {
 
         res.redirect("/admin/products");
     } catch (error) {
-        console.error("Error at editProduct:", error);
+        console.error(ADMIN_MESSAGES.EDIT_PRODUCT_ERROR, error);
         res.redirect("/admin/errorPage");
     }
 };
 
 const deleteSingleImage = async (req, res) => {
     try {
-        console.log("req.body", req.body);
+        // req.body, req.body);
 
         const { imageId, productId } = req.body;
         const product = await Product.findByIdAndUpdate(productId, { $pull: { productImage: imageId } });
-        res.status(200).json({ success: true, message: "Image deleted successfully" });
+        res.status(STATUS_CODE.OK).json({ success: true, message: ADMIN_MESSAGES.IMAGE_DELETED_SUCCESSFULLY });
         const imagePath = path.join("public", "uploads", "product-image", imageId);
-        console.log("imagePath", imagePath)
+        // imagePath, imagePath)
         if (fs.existsSync(imagePath)) {
             fs.unlinkSync(imagePath);
             console.log(`image ${imageId} deleted successfully`);
-            return res.status(200).json({ success: true, message: "Image deleted successfully" });
+            return res.status(STATUS_CODE.OK).json({ success: true, message: ADMIN_MESSAGES.IMAGE_DELETED_SUCCESSFULLY });
         } else {
-            console.log(`image ${imageId} not found`);
+            console.log(ADMIN_MESSAGES.IMAGE_NOT_FOUND, imageId);
         }
     } catch (error) {
         res.redirect("/admin/errorPage");
@@ -304,13 +306,13 @@ const addOffer = async (req, res) => {
         const { offer } = req.body;
 
         if (!productId) {
-            return res.status(400).json({ success: false, message: "Product ID is required." });
+            return res.status(STATUS_CODE.BAD_REQUEST).json({ success: false, message: ADMIN_MESSAGES.PRODUCT_ID_IS_REQUIRED });
         }
 
         const product = await Product.findOne({ _id: productId }).populate('category');
 
         if (!product) {
-            return res.status(404).json({ success: false, message: "Product not found." });
+            return res.status(STATUS_CODE.NOT_FOUND).json({ success: false, message: ADMIN_MESSAGES.PRODUCT_NOT_FOUND });
         }
 
         const productOffer = parseFloat(offer || 0);
@@ -323,15 +325,15 @@ const addOffer = async (req, res) => {
 
         await product.save();
 
-        return res.status(200).json({
+        return res.status(STATUS_CODE.OK).json({
             success: true,
             message: highestOffer === 0
                 ? "Offer removed successfully!"
                 : "Offer added/updated successfully!",
         });
     } catch (error) {
-        console.error("Error adding offer:", error);
-        res.status(500).json({ success: false, message: "Internal server error." });
+        console.error(ADMIN_MESSAGES.ERROR_ADDING_OFFER, error);
+        res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).json({ success: false, message: ADMIN_MESSAGES.INTERNAL_SERVER_ERROR_3 });
     }
 };
 
@@ -341,34 +343,34 @@ const addCategoryOffer = async (req, res) => {
     try {
 
         if (!categoryId || offerValue === undefined) {
-            return res.status(400).json({
+            return res.status(STATUS_CODE.BAD_REQUEST).json({
                 success: false,
-                message: 'Category ID and offer value are required.',
+                message: ADMIN_MESSAGES.CATEGORY_ID_AND_OFFER_VALUE_ARE_REQUIRED,
             });
         }
 
         if (isNaN(offerValue)) {
-            return res.status(400).json({
+            return res.status(STATUS_CODE.BAD_REQUEST).json({
                 success: false,
-                message: 'Offer value must be a valid number.',
+                message: ADMIN_MESSAGES.OFFER_VALUE_MUST_BE_A_VALID_NUMBER,
             });
         }
 
         const percentageValue = parseFloat(offerValue);
 
         if (percentageValue < 0 || percentageValue > 100) {
-            return res.status(400).json({
+            return res.status(STATUS_CODE.BAD_REQUEST).json({
                 success: false,
-                message: 'Offer value must be between 0 and 100 (inclusive).',
+                message: ADMIN_MESSAGES.OFFER_VALUE_MUST_BE_BETWEEN_0_AND_100_INCLUSIVE,
             });
         }
 
 
         const category = await Category.findById(categoryId);
         if (!category) {
-            return res.status(404).json({
+            return res.status(STATUS_CODE.NOT_FOUND).json({
                 success: false,
-                message: 'Category not found.',
+                message: ADMIN_MESSAGES.CATEGORY_NOT_FOUND,
             });
         }
 
@@ -388,15 +390,15 @@ const addCategoryOffer = async (req, res) => {
 
         await Promise.all(updatePromises);
 
-        res.status(200).json({
+        res.status(STATUS_CODE.OK).json({
             success: true,
-            message: 'Category offer added successfully, and all related products updated!',
+            message: ADMIN_MESSAGES.CATEGORY_OFFER_ADDED_SUCCESSFULLY_AND_ALL_RELATED_PRODUCTS_UPDATED,
         });
     } catch (error) {
-        console.error('Error adding category offer:', error);
-        res.status(500).json({
+        console.error(ADMIN_MESSAGES.ERROR_ADDING_CATEGORY_OFFER, error);
+        res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).json({
             success: false,
-            message: 'Failed to add category offer due to a server error.',
+            message: ADMIN_MESSAGES.FAILED_TO_ADD_CATEGORY_OFFER_DUE_TO_A_SERVER_ERROR,
         });
     }
 };

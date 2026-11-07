@@ -1,3 +1,5 @@
+const { STATUS_CODE } = require("../../constants/StatusCode");
+const { ADMIN_MESSAGES } = require("../../constants/messages/AdminMessages");
 const Brand = require("../../models/brandSchema")
 const Product = require("../../models/productSchema")
 
@@ -26,7 +28,7 @@ const getBrandPage = async (req, res) => {
         })
 
     } catch (error) {
-        console.log('Error at getBrandPage');
+        console.log(ADMIN_MESSAGES.GET_BRAND_PAGE_ERROR);
         res.redirect("/admin/errorPage");
     }
 }
@@ -39,13 +41,13 @@ const addBrands = async (req, res) => {
         const findBrand = await Brand.findOne({ brandName });
 
         if (findBrand) {
-            return res.status(400).json({ success: false, message: 'Brand already exists' });
+            return res.status(STATUS_CODE.BAD_REQUEST).json({ success: false, message: ADMIN_MESSAGES.BRAND_ALREADY_EXISTS });
         }
 
         const image = req.file.filename;
 
         if (!image) {
-            return res.status(400).json({ success: false, message: 'Brand image is required' });
+            return res.status(STATUS_CODE.BAD_REQUEST).json({ success: false, message: ADMIN_MESSAGES.BRAND_IMAGE_IS_REQUIRED });
         }
 
         const newBrand = new Brand({
@@ -56,16 +58,16 @@ const addBrands = async (req, res) => {
 
 
         await newBrand.save();
-        res.status(200).json({
+        res.status(STATUS_CODE.OK).json({
             success: true,
-            message: 'Brand added successfully',
+            message: ADMIN_MESSAGES.BRAND_ADDED_SUCCESSFULLY,
             newBrand,
             redirectUrl: '/admin/brands'
         });
 
     } catch (error) {
-        console.error("Error in addBrands function:", error);
-        res.status(500).json({ success: false, message: 'An error occurred while adding the brand' });
+        console.error(ADMIN_MESSAGES.ERROR_IN_ADDBRANDS_FUNCTION, error);
+        res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).json({ success: false, message: ADMIN_MESSAGES.AN_ERROR_OCCURRED_WHILE_ADDING_THE_BRAND });
     }
 }
 
@@ -80,7 +82,7 @@ const listCategory = async (req, res) => {
 
         console.log(brand)
         if (!brand) {
-            return res.status(404).render('pageNOtFound', { error: "User not Found" })
+            return res.status(STATUS_CODE.NOT_FOUND).render('pageNOtFound', { error: ADMIN_MESSAGES.USER_NOT_FOUND })
         }
 
         res.redirect('/admin/brands')
@@ -97,17 +99,17 @@ const deleteBrand = async (req, res) => {
         console.log(req.query, ',,,,,,,,', { _id });
 
         if (!_id) {
-            console.log("Brand does not exists");
-            return res.status(400).json({ success: false, redirectUrl: '/admin/deleteBrand' })
+            // Brand does not exists);
+            return res.status(STATUS_CODE.BAD_REQUEST).json({ success: false, redirectUrl: '/admin/deleteBrand' })
         }
         await Brand.deleteOne({ _id })
        
 
-        return res.json({ success: true, redirectUrl: 'admin/deleteBrand', message: "Brand Deleted successfully" })
+        return res.json({ success: true, redirectUrl: 'admin/deleteBrand', message: ADMIN_MESSAGES.BRAND_DELETED_SUCCESSFULLY })
 
     } catch (error) {
-        console.error('Error deleting brand:', error);
-        return res.status(500).json({ success: false, message: "Internal Server Error" });
+        console.error(ADMIN_MESSAGES.ERROR_DELETING_BRAND, error);
+        return res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).json({ success: false, message: ADMIN_MESSAGES.INTERNAL_SERVER_ERROR });
     }
 }
 

@@ -1,3 +1,5 @@
+const { STATUS_CODE } = require("../../constants/StatusCode");
+const { ADMIN_MESSAGES } = require("../../constants/messages/AdminMessages");
 const Coupon = require("../../models/couponSchema");
 const ITEMS_PER_PAGE = 5;
 
@@ -22,7 +24,7 @@ const getCouponsPage = async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        res.status(500).send("Something went wrong");
+        res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).send(ADMIN_MESSAGES.SOMETHING_WENT_WRONG);
     }
 };
 
@@ -32,17 +34,17 @@ const createCoupon = async (req, res) => {
 
 
         if (!code || !discountPercentage || !minPurchaseAmount || !maxPurchaseAmount || !startDate || !endDate || !quantity) {
-            return res.status(400).render("error", { message: "All fields are required" });
+            return res.status(STATUS_CODE.BAD_REQUEST).render("error", { message: ADMIN_MESSAGES.ALL_FIELDS_ARE_REQUIRED });
         }
 
         if (quantity <= 0) {
-            return res.status(400).render("error", { message: "Quantity must be greater than 0" });
+            return res.status(STATUS_CODE.BAD_REQUEST).render("error", { message: ADMIN_MESSAGES.QUANTITY_MUST_BE_GREATER_THAN_0 });
         }
 
 
         const existingCoupon = await Coupon.findOne({ code });
         if (existingCoupon) {
-            return res.status(400).render("error", { message: "Coupon code already exists" });
+            return res.status(STATUS_CODE.BAD_REQUEST).render("error", { message: ADMIN_MESSAGES.COUPON_CODE_ALREADY_EXISTS });
         }
 
         const newCoupon = new Coupon({
@@ -57,8 +59,8 @@ const createCoupon = async (req, res) => {
         await newCoupon.save();
         res.redirect("/admin/coupons");
     } catch (error) {
-        console.error("Error creating coupon:", error);
-        res.status(500).render("error", { message: "Failed to create coupon" });
+        console.error(ADMIN_MESSAGES.ERROR_CREATING_COUPON, error);
+        res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).render("error", { message: ADMIN_MESSAGES.FAILED_TO_CREATE_COUPON });
     }
 };
 
@@ -68,8 +70,8 @@ const deleteCoupon = async (req, res) => {
         await Coupon.findByIdAndDelete(couponId);
         res.redirect("/admin/coupons");
     } catch (error) {
-        console.error("Error deleting coupon:", error);
-        res.status(500).render("error", { message: "Failed to delete coupon" });
+        console.error(ADMIN_MESSAGES.ERROR_DELETING_COUPON, error);
+        res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).render("error", { message: ADMIN_MESSAGES.FAILED_TO_DELETE_COUPON });
     }
 };
 
@@ -91,12 +93,12 @@ const updateCoupon = async (req, res) => {
         const coupon = await Coupon.findById(couponId);
 
         if (!coupon) {
-            return res.status(404).send("Coupon not found");
+            return res.status(STATUS_CODE.NOT_FOUND).send(ADMIN_MESSAGES.COUPON_NOT_FOUND);
         }
 
         // Validate purchase amounts
         if (Number(minPurchaseAmount) > Number(maxPurchaseAmount)) {
-            return res.status(400).send("Minimum amount cannot exceed maximum amount");
+            return res.status(STATUS_CODE.BAD_REQUEST).send(ADMIN_MESSAGES.MINIMUM_AMOUNT_CANNOT_EXCEED_MAXIMUM_AMOUNT);
         }
 
         // Update coupon
@@ -117,8 +119,8 @@ const updateCoupon = async (req, res) => {
         res.redirect("/admin/coupons");
 
     } catch (error) {
-        console.error("Error updating coupon:", error);
-        res.status(500).send("Something went wrong");
+        console.error(ADMIN_MESSAGES.ERROR_UPDATING_COUPON, error);
+        res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).send(ADMIN_MESSAGES.SOMETHING_WENT_WRONG);
     }
 };
 

@@ -1,3 +1,4 @@
+const { COMMON_MESSAGES } = require("../../constants/messages/CommonMessages");
 const User = require("../../models/userSchema");
 const Category = require("../../models/categorySchema")
 //const Brand = require("../../models/brandSchema")
@@ -35,7 +36,7 @@ const productDetails = async (req, res) => {
         })
 
     } catch (error) {
-        console.log("Error on fetching productdetails ", error);
+        console.log(COMMON_MESSAGES.ERROR_ON_FETCHING_PRODUCTDETAILS, error);
         res.redirect("/pageNotFound")
     }
 }

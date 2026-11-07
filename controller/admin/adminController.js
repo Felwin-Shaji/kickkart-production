@@ -1,3 +1,5 @@
+const { STATUS_CODE } = require("../../constants/StatusCode");
+const { ADMIN_MESSAGES } = require("../../constants/messages/AdminMessages");
 const Admin = require("../../models/userSchema");
 const Order = require("../../models/orderSchema")
 const mongoose = require("mongoose");
@@ -12,7 +14,7 @@ require('pdfkit-table');
 const doc = new PDFDocument();
 
 const errorPage = async (req, res) => {
-    res.status(404).render('adminErrorPage')
+    res.status(STATUS_CODE.NOT_FOUND).render('adminErrorPage')
 }
 
 const loadLogin = async (req, res) => {
@@ -23,7 +25,7 @@ const loadLogin = async (req, res) => {
             res.redirect('/admin')
         }
     } catch (error) {
-        console.log('loadLoign is not working');
+        console.log(ADMIN_MESSAGES.LOADLOIGN_IS_NOT_WORKING);
         res.redirect("/admin/errorPage");
     }
 }
@@ -33,26 +35,35 @@ const Login = async (req, res) => {
         const { email, password } = req.body;
 
         const admin = await Admin.findOne({ email, isAdmin: true });
-        console.log(admin);
-        console.log(admin.email)
 
         if (admin) {
-
 
             const passwordMatch = await bcrypt.compare(password, admin.password)
             if (passwordMatch) {
                 req.session.admin = true;
-                return res.json({ success: true, redirectUrl: "/admin", message: "Login successful!" });
+
+                req.session.save((error) => {
+                    if (error) {
+                        console.error("Session save error:", error);
+                        return res.status(500).json({ success: false });
+                    }
+
+                    return res.json({
+                        success: true,
+                        redirectUrl: "/admin",
+                        message: ADMIN_MESSAGES.LOGIN_SUCCESS
+                    });
+                });
 
             } else {
-                res.json({ success: false, message: "Invalid credentials." });
+                res.json({ success: false, message: ADMIN_MESSAGES.INVALID_CREDENTIALS });
             }
         } else {
             return res.redirect('/login');
         }
 
     } catch (error) {
-        console.log('cannot get admin login ');
+        console.log(ADMIN_MESSAGES.CANNOT_GET_ADMIN_LOGIN);
         res.redirect("/admin/errorPage");
     }
 }
@@ -61,13 +72,13 @@ const adminLogout = async (req, res) => {
     try {
         req.session.destroy((err) => {
             if (err) {
-                console.log('session destruction error ', err.message);
+                console.log(ADMIN_MESSAGES.SESSION_DESTRUCTION_ERROR, err.message);
                 return res.redirect('/pageNotFound');
             }
             return res.redirect('/admin/login');
         })
     } catch (error) {
-        console.log("logout error ", error);
+        console.log(ADMIN_MESSAGES.LOGOUT_ERROR, error);
         res.redirect("/admin/errorPage");
     }
 }
@@ -75,7 +86,7 @@ const adminLogout = async (req, res) => {
 const loadDashboard = async (req, res) => {
     try {
         const filter = req.query.filter;
-        console.log("filterfilter", filter);
+        // filterfilter, filter);
 
         let dateFilter = {};
 
@@ -95,7 +106,7 @@ const loadDashboard = async (req, res) => {
                     fromDate.setFullYear(fromDate.getFullYear() - 1);
                     break;
             }
-            console.log("Filter applied from:", fromDate);
+            // Filter applied from:, fromDate);
             dateFilter = { createdAt: { $gte: fromDate } };
         }
 
@@ -126,7 +137,7 @@ const loadDashboard = async (req, res) => {
             }
         ]);
 
-        console.log("sales", sales)
+        // sales, sales)
 
 
         const topProducts = await Order.aggregate([
@@ -216,7 +227,7 @@ const loadDashboard = async (req, res) => {
         res.render("adminDashboard", { product: topProducts, category: topCategories, brands: topBrands, sales, filter });
 
     } catch (error) {
-        console.error("Error loading dashboard:", error);
+        console.error(ADMIN_MESSAGES.DASHBOARD_LOAD_ERROR, error);
         res.redirect("/admin/errorPage");
     }
 };
@@ -249,7 +260,7 @@ const loadSalesReport = async (req, res) => {
             const end = new Date(endDate);
 
             if (isNaN(start.getTime()) || isNaN(end.getTime()) || start > end) {
-                return res.status(400).send("Invalid date range");
+                return res.status(STATUS_CODE.BAD_REQUEST).send(ADMIN_MESSAGES.INVALID_DATE_RANGE);
             }
 
             // Include the complete end date when date-only values are supplied
@@ -367,7 +378,7 @@ const loadSalesReport = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Error loading sales report:", error);
+        console.error(ADMIN_MESSAGES.SALES_REPORT_LOAD_ERROR, error);
         res.redirect("/admin/errorPage");
     }
 };
@@ -425,7 +436,7 @@ const salceReportPDF = (req, res) => {
 
     // Draw table headers and data
     drawHeaders();
-    console.log("salesData:", salesData);
+    // salesData:, salesData);
 
 
     // Draw data rows

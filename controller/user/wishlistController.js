@@ -1,3 +1,5 @@
+const { STATUS_CODE } = require("../../constants/StatusCode");
+const { COMMON_MESSAGES } = require("../../constants/messages/CommonMessages");
 const Wishlist = require("../../models/wishlistSchema")
 const User = require("../../models/userSchema")
 
@@ -6,8 +8,8 @@ const addToWishlist = async (req, res) => {
         const productId = req.body.productId; // Correct variable name
         const userId = req.session.user; // Assumes `userId` is stored in session
 
-        console.log("userId", userId);
-        console.log("productId", productId);
+        // userId, userId);
+        // productId, productId);
 
         // Find the wishlist by userId
         let wishlist = await Wishlist.findOne({ userId });
@@ -30,26 +32,26 @@ const addToWishlist = async (req, res) => {
             if (existingProductIndex === -1) {
                 wishlist.products.push(product);
             } else {
-                return res.status(200).json({ message: "Product already in wishlist" });
+                return res.status(STATUS_CODE.OK).json({ message: COMMON_MESSAGES.PRODUCT_ALREADY_IN_WISHLIST });
             }
         }
 
         await wishlist.save();
 
-        res.status(200).json({ message: "Product added to wishlist successfully" });
+        res.status(STATUS_CODE.OK).json({ message: COMMON_MESSAGES.PRODUCT_ADDED_TO_WISHLIST_SUCCESSFULLY });
     } catch (error) {
-        console.error("Error adding to wishlist:", error);
-        res.status(500).json({ error: "An error occurred while adding to wishlist" });
+        console.error(COMMON_MESSAGES.ERROR_ADDING_TO_WISHLIST, error);
+        res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).json({ error: COMMON_MESSAGES.AN_ERROR_OCCURRED_WHILE_ADDING_TO_WISHLIST });
     }
 };
 
 
 const getWishlist = async (req, res) => {
     try {
-        console.log("Fetching wishlist...");
+        // Fetching wishlist...);
 
         const user = req.session.user; // Assumes `userId` is stored in session
-        console.log("User:", user);
+        // User:, user);
 
         // Query Wishlist by userId
         let wishlist = await Wishlist.findOne({ userId: user }).populate("products.productId");
@@ -70,11 +72,11 @@ const getWishlist = async (req, res) => {
             }
         });
 
-        console.log('Wishlist:', JSON.stringify(wishlist, null, 2));
+        // Wishlist:, JSON.stringify(wishlist, null, 2));
 
         return res.render('shop/wishlist', { wishlist });
     } catch (error) {
-        console.error("Error fetching wishlist:", error.message);
+        console.error(COMMON_MESSAGES.ERROR_FETCHING_WISHLIST, error.message);
         return res.redirect('/500');
     }
 };
@@ -82,7 +84,7 @@ const getWishlist = async (req, res) => {
 const removeFromWishlist = async (req, res) => {
     try {
         const { productId } = req.body; // Extract productId from the request body
-        console.log("Product ID to remove:", productId);
+        // Product ID to remove:, productId);
 
         // Use $pull to remove the product from the products array
         const result = await Wishlist.updateOne(
@@ -91,13 +93,13 @@ const removeFromWishlist = async (req, res) => {
         );
 
         if (result.modifiedCount > 0) {
-            res.status(200).json({ success: true, message: "Item removed successfully" });
+            res.status(STATUS_CODE.OK).json({ success: true, message: COMMON_MESSAGES.ITEM_REMOVED_SUCCESSFULLY });
         } else {
-            res.status(404).json({ success: false, message: "Item not found in wishlist" });
+            res.status(STATUS_CODE.NOT_FOUND).json({ success: false, message: COMMON_MESSAGES.ITEM_NOT_FOUND_IN_WISHLIST });
         }
     } catch (error) {
-        console.error("Error removing item from wishlist:", error);
-        res.status(500).json({ success: false, message: "An error occurred. Please try again." });
+        console.error(COMMON_MESSAGES.ERROR_REMOVING_ITEM_FROM_WISHLIST, error);
+        res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).json({ success: false, message: COMMON_MESSAGES.AN_ERROR_OCCURRED_PLEASE_TRY_AGAIN });
     }
 };
 

@@ -1,3 +1,5 @@
+const { STATUS_CODE } = require("../../constants/StatusCode");
+const { ADMIN_MESSAGES } = require("../../constants/messages/AdminMessages");
 const User = require('../../models/userSchema');
 
 const customerInfo = async (req, res) => {
@@ -47,7 +49,7 @@ const customerInfo = async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).send('Internal Server Error');
+        res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).send(ADMIN_MESSAGES.INTERNAL_SERVER_ERROR);
         res.redirect("/admin/errorPage");
     }
 };
@@ -64,7 +66,7 @@ const customerBlock = async (req, res) => {
         res.redirect("/admin/users");
 
     } catch (error) {
-        console.log('customerBlock function is not working')
+        console.log(ADMIN_MESSAGES.CUSTOMER_BLOCK_ERROR_LOG)
         res.redirect("/admin/errorPage");
     }
 }
@@ -79,7 +81,7 @@ const customerUnblock = async (req, res) => {
         res.redirect("/admin/users");
 
     } catch (error) {
-        console.log('customerUnblock function is not working')
+        console.log(ADMIN_MESSAGES.CUSTOMER_UNBLOCK_ERROR_LOG)
         res.redirect("/admin/errorPage");
     }
 }

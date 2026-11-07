@@ -1,3 +1,5 @@
+const { STATUS_CODE } = require("../../constants/StatusCode");
+const { COMMON_MESSAGES } = require("../../constants/messages/CommonMessages");
 const User = require("../../models/userSchema");
 const Category = require("../../models/categorySchema")
 const Brand = require("../../models/brandSchema")
@@ -200,7 +202,7 @@ const filterProduct = async (req, res) => {
             wishlistProductIds
         });
     } catch (error) {
-        console.error('Error filtering products:', error);
+        console.error(COMMON_MESSAGES.ERROR_FILTERING_PRODUCTS, error);
         res.redirect('/pageNotFound');
     }
 };
@@ -218,7 +220,7 @@ const searchProduct = async (req, res) => {
         }
 
         const searchQuery = req.body.search || "";
-        console.log("Search Query:", searchQuery);
+        // Search Query:, searchQuery);
 
         const wishlist = await Wishlist.findOne({ userId: userId });
         const wishlistProductIds = wishlist
@@ -276,7 +278,7 @@ const searchProduct = async (req, res) => {
         });
 
     } catch (error) {
-        console.log("Error in searchProduct:", error);
+        console.log(COMMON_MESSAGES.ERROR_IN_SEARCHPRODUCT, error);
         res.redirect("/pageNotFound");
     }
 };
@@ -317,8 +319,8 @@ const loadHomePage = async (req, res) => {
             });
         }
     } catch (error) {
-        console.error('Error loading home page:', error.message);
-        res.status(500).send('Server error');
+        console.error(COMMON_MESSAGES.ERROR_LOADING_HOME_PAGE, error.message);
+        res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).send(COMMON_MESSAGES.SERVER_ERROR_2);
     }
 }
 
@@ -329,8 +331,8 @@ const loadSignup = async (req, res) => {
             return res.render('auth/signup')
         }
     } catch (error) {
-        console.log("Home page not loading:", error)
-        res.status(500).send('Server Error');
+        console.log(COMMON_MESSAGES.HOME_PAGE_NOT_LOADING, error)
+        res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).send(COMMON_MESSAGES.SERVER_ERROR);
     }
 }
 
@@ -357,7 +359,7 @@ async function sendVerificationEmail(email, otp) {    ////nodemailer
 
         return info.accepted.length > 0
     } catch (error) {
-        console.log('Error sending email ', error);
+        console.log(COMMON_MESSAGES.ERROR_SENDING_EMAIL, error);
         return false;
     }
 }
@@ -365,45 +367,45 @@ async function sendVerificationEmail(email, otp) {    ////nodemailer
 const signup = async (req, res) => {
     try {
         const { name, phone, email, password, confirmPassword, referralCodeInput } = req.body;
-        console.log("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy", req.body)
+        // yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy, req.body)
 
-        console.log("req.body", req.body);
+        // req.body, req.body);
 
         if (!name || !phone || !email || !password || !confirmPassword) {
-            return res.status(400).json({ success: false, message: 'All fields are required' });
+            return res.status(STATUS_CODE.BAD_REQUEST).json({ success: false, message: COMMON_MESSAGES.ALL_FIELDS_ARE_REQUIRED });
         }
 
         if (password !== confirmPassword) {
-            return res.status(400).json({ success: false, message: 'Passwords do not match' });
+            return res.status(STATUS_CODE.BAD_REQUEST).json({ success: false, message: COMMON_MESSAGES.PASSWORDS_DO_NOT_MATCH });
         }
 
         if (!validator.isEmail(email)) {
-            return res.status(400).json({ success: false, message: 'Invalid email format' });
+            return res.status(STATUS_CODE.BAD_REQUEST).json({ success: false, message: COMMON_MESSAGES.INVALID_EMAIL_FORMAT });
         }
 
         const findUser = await User.findOne({ email });
         if (findUser) {
-            return res.status(400).json({ success: false, message: 'Email already in use' });
+            return res.status(STATUS_CODE.BAD_REQUEST).json({ success: false, message: COMMON_MESSAGES.EMAIL_ALREADY_IN_USE });
         }
 
         const otp = generateOtp();
-        console.log('Signup successful, OTP sent', otp);
+        // Signup successful, OTP sent, otp);
 
         const emailSent = await sendVerificationEmail(email, otp);
         if (!emailSent) {
-            return res.status(500).json({ success: false, message: 'Failed to send OTP. Please try again.' });
+            return res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).json({ success: false, message: COMMON_MESSAGES.FAILED_TO_SEND_OTP_PLEASE_TRY_AGAIN_2 });
         }
 
         req.session.userOtp = otp;
         req.session.userData = { name, phone, email, password, referralCodeInput };
         req.session.otpExpiry = Date.now() + 60000;
 
-        console.log('Signup successful, OTP sent', req.session.userOtp);
+        // Signup successful, OTP sent, req.session.userOtp);
 
-        return res.status(200).json({ success: true, message: 'OTP sent successfully', redirectTo: '/verify-otp' });
+        return res.status(STATUS_CODE.OK).json({ success: true, message: COMMON_MESSAGES.OTP_SENT_SUCCESSFULLY, redirectTo: '/verify-otp' });
     } catch (error) {
-        console.error('Signup error:', error);
-        return res.status(500).json({ success: false, message: 'Internal server error' });
+        console.error(COMMON_MESSAGES.SIGNUP_ERROR, error);
+        return res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).json({ success: false, message: COMMON_MESSAGES.INTERNAL_SERVER_ERROR_2 });
     }
 };
 
@@ -412,21 +414,21 @@ const verifyReferralCode = async (req, res) => {
         const { referralCode } = req.body;
 
         if (!referralCode) {
-            return res.status(400).json({ message: "Referral code is required." });
+            return res.status(STATUS_CODE.BAD_REQUEST).json({ message: COMMON_MESSAGES.REFERRAL_CODE_IS_REQUIRED });
         }
 
         const user = await User.findOne({ referalCode: referralCode });
 
         if (user) {
-            return res.status(200).json({
-                message: "Referral code is valid.",  //userName: user.name, // Optional: Provide additional info, like the referrer's name
+            return res.status(STATUS_CODE.OK).json({
+                message: COMMON_MESSAGES.REFERRAL_CODE_IS_VALID,  //userName: user.name, // Optional: Provide additional info, like the referrer's name
             });
         } else {
-            return res.status(404).json({ message: "Invalid referral code." });
+            return res.status(STATUS_CODE.NOT_FOUND).json({ message: COMMON_MESSAGES.INVALID_REFERRAL_CODE });
         }
     } catch (error) {
-        console.error("Error verifying referral code:", error);
-        return res.status(500).json({ message: "Server error. Please try again later." });
+        console.error(COMMON_MESSAGES.ERROR_VERIFYING_REFERRAL_CODE, error);
+        return res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).json({ message: COMMON_MESSAGES.SERVER_ERROR_PLEASE_TRY_AGAIN_LATER });
     }
 };
 
@@ -444,13 +446,13 @@ const getVerifyOTP = async (req, res) => {
         const otp = req.session.userOtp;
 
         if (!otp) {
-            console.error("OTP expired or not found in session.");
+            console.error(COMMON_MESSAGES.OTP_EXPIRED_OR_NOT_FOUND_IN_SESSION);
             return res.redirect("/pageNotFound");
         }
 
         res.render("auth/Verify-Otp");
     } catch (error) {
-        console.error("Error at getVerifyOTP:", error.message || error);
+        console.error(COMMON_MESSAGES.GET_VERIFY_OTP_ERROR, error.message || error);
         res.redirect("/pageNotFound");
     }
 };
@@ -460,20 +462,17 @@ const verifyOtp = async (req, res) => {
         const user = req.session.userData;
         const { otp } = req.body;
         //const userData = req.session.userData
-
-
-
-        console.log("ooooo", req.body)
+        // ooooo, req.body)
 
         if (!otp || !user) {
-            console.error("Missing OTP or user data in session.");
-            return res.status(400).json({
+            console.error(COMMON_MESSAGES.MISSING_OTP_OR_USER_DATA_IN_SESSION);
+            return res.status(STATUS_CODE.BAD_REQUEST).json({
                 success: false,
-                message: "Session expired or invalid data. Please try again.",
+                message: COMMON_MESSAGES.SESSION_EXPIRED_OR_INVALID_DATA_PLEASE_TRY_AGAIN,
             });
         }
 
-        console.log("Received OTP:", otp);
+        // Received OTP:, otp);
 
         if (otp === req.session.userOtp) {
 
@@ -491,9 +490,9 @@ const verifyOtp = async (req, res) => {
             } else if (user.referralCodeInput) {
                 const referalUser = await User.findOne({ referalCode: user.referralCodeInput }); // Use findOne instead of find
                 if (!referalUser) {
-                    return res.status(400).json({
+                    return res.status(STATUS_CODE.BAD_REQUEST).json({
                         success: false,
-                        message: "Invalid referral code. Please try again.",
+                        message: COMMON_MESSAGES.INVALID_REFERRAL_CODE_PLEASE_TRY_AGAIN,
                     });
                 }
 
@@ -537,21 +536,21 @@ const verifyOtp = async (req, res) => {
 
             res.json({
                 success: true,
-                message: "OTP verified successfully.",
+                message: COMMON_MESSAGES.OTP_VERIFIED_SUCCESSFULLY,
                 redirectUrl: "/login",
             });
         } else {
-            console.error("Invalid OTP entered.");
-            res.status(400).json({
+            console.error(COMMON_MESSAGES.INVALID_OTP_ENTERED);
+            res.status(STATUS_CODE.BAD_REQUEST).json({
                 success: false,
-                message: "Invalid OTP. Please try again.",
+                message: COMMON_MESSAGES.INVALID_OTP_PLEASE_TRY_AGAIN,
             });
         }
     } catch (error) {
-        console.error("Error at verifyOtp:", error.message || error);
-        res.status(500).json({
+        console.error(COMMON_MESSAGES.VERIFY_OTP_ERROR, error.message || error);
+        res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).json({
             success: false,
-            message: "An internal error occurred. Please try again later.",
+            message: COMMON_MESSAGES.AN_INTERNAL_ERROR_OCCURRED_PLEASE_TRY_AGAIN_LATER,
         });
     }
 };
@@ -561,22 +560,22 @@ const resendOtp = async (req, res) => {
 
         const { email } = req.session.userData
         if (!email) {
-            return res.status(400).json({ success: false, message: 'Email not found in session' })
+            return res.status(STATUS_CODE.BAD_REQUEST).json({ success: false, message: COMMON_MESSAGES.EMAIL_NOT_FOUND_IN_SESSION })
         }
         const otp = generateOtp();
         req.session.userOtp = otp;
 
         const emailSent = await sendVerificationEmail(email, otp);
         if (emailSent) {
-            console.log('Resend Otp :', otp);
-            res.status(200).json({ success: true, message: 'Otp Resend Successfully' })
+            // Resend Otp :, otp);
+            res.status(STATUS_CODE.OK).json({ success: true, message: COMMON_MESSAGES.OTP_RESEND_SUCCESSFULLY })
         } else {
-            res.status(500).json({ success: false, message: 'Failed to resend OTP. Please try again ' });
+            res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).json({ success: false, message: COMMON_MESSAGES.FAILED_TO_RESEND_OTP_PLEASE_TRY_AGAIN });
         }
 
     } catch (error) {
-        console.error('Error resending OTP ', error);
-        res.status(500).json({ success: false, message: "Internal server error. Please try again." })
+        console.error(COMMON_MESSAGES.ERROR_RESENDING_OTP, error);
+        res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).json({ success: false, message: COMMON_MESSAGES.INTERNAL_SERVER_ERROR_PLEASE_TRY_AGAIN })
     }
 }
 
@@ -604,14 +603,14 @@ const Login = async (req, res) => {
         if (!findUser) {
             return res.json({
                 sucess: false,
-                message: 'user not found',
+                message: COMMON_MESSAGES.USER_NOT_FOUND_2,
                 redirectUrl: '/login',
             })
         }
         if (findUser.isBlocked) {
             return res.json({
                 sucess: false,
-                message: " User is Blocked by admin",
+                message: COMMON_MESSAGES.USER_IS_BLOCKED_BY_ADMIN,
                 redirectUrl: '/login'
             })
         }
@@ -621,7 +620,7 @@ const Login = async (req, res) => {
         if (!passwordMatch) {
             return res.json({
                 success: false,
-                message: "Incorrect password",
+                message: COMMON_MESSAGES.INCORRECT_PASSWORD,
                 redirectUrl: '/login'
             })
         }
@@ -631,14 +630,14 @@ const Login = async (req, res) => {
 
         return res.json({
             success: true,
-            message: "Login Successfull!",
+            message: COMMON_MESSAGES.LOGIN_SUCCESSFULL,
             redirectUrl: '/'
         });
 
 
     } catch (error) {
-        console.error("login error :", error)
-        res.render('auth/login', { message: "login failed please try again later" })
+        console.error(COMMON_MESSAGES.LOGIN_ERROR, error)
+        res.render('auth/login', { message: COMMON_MESSAGES.LOGIN_FAILED_PLEASE_TRY_AGAIN_LATER })
     }
 }
 
@@ -646,14 +645,14 @@ const logout = async (req, res) => {
     try {
         req.session.destroy((err) => {
             if (err) {
-                console.log('Session destruction error:', err.message);
+                console.log(COMMON_MESSAGES.SESSION_DESTRUCTION_ERROR, err.message);
                 return res.redirect('/pageNotFound');
             }
             res.clearCookie('connect.sid');
             res.redirect('/');
         });
     } catch (error) {
-        console.log("Logout error:", error);
+        console.log(COMMON_MESSAGES.LOGOUT_ERROR, error);
         res.redirect('/pageNotFound');
     }
 };
